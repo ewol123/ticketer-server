@@ -39,7 +39,7 @@ func (h *handler) serializer(contentType string) user.Serializer {
 }
 
 // NewHandler : returns a new UserHandler
-func NewHandler(userService user.UserService) UserHandler {
+func NewHandler(userService user.Service) UserHandler {
 	return &handler{userService: userService}
 }
 

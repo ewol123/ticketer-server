@@ -43,8 +43,7 @@ func NewPgRepository(connectionString string) (user.Repository, error) {
 		if err != nil {
 			attempt++
 			log.Fatalln(err)
-		}
-		else {
+		} else {
 			attempt = 100
 			repo.client = client
 		}
