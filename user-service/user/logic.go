@@ -26,7 +26,7 @@ func NewUserService(userRepo Repository) Service {
 	}
 }
 
-func (u *userService) Find(id int) (*User, error) {
+func (u *userService) Find(id string) (*User, error) {
 	return u.Find(id)
 }
 

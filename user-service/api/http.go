@@ -15,7 +15,7 @@ import (
 // UserHandler : UserHandler interface with Get and Post methods
 type UserHandler interface {
 	Get(http.ResponseWriter, *http.Request)
-	Post(htp.ResponseWriter, *http.Request)
+	Post(http.ResponseWriter, *http.Request)
 }
 
 type handler struct {
@@ -47,7 +47,7 @@ func NewHandler(userService user.UserService) UserHandler {
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	contentType := r.Header.Get("Content-Type")
-	user, err := h.userService.Find(id)
+	res, err := h.userService.Find(id)
 	if err != nil {
 		if errors.Cause(err) == user.ErrUserNotFound {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -57,7 +57,7 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseBody, err := h.serializer(contentType).Encode(user)
+	responseBody, err := h.serializer(contentType).Encode(res)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -74,12 +74,12 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	user, err := h.serializer(contentType).Decode(requestBody)
+	userReq, err := h.serializer(contentType).Decode(requestBody)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	err = h.userService.Store(user)
+	err = h.userService.Store(userReq)
 	if err != nil {
 		if errors.Cause(err) == user.ErrUserInvalid {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -88,7 +88,7 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	responseBody, err := h.serializer(contentType).Encode(user)
+	responseBody, err := h.serializer(contentType).Encode(userReq)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

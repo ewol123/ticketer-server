@@ -2,7 +2,7 @@ package user
 
 // User : user model
 type User struct {
-	Id        int    `db:id json:id`
+	Id        string    `db:id json:id`
 	CreatedAt int64  `db:created_at json:created_at`
 	UpdatedAt int64  `db:updated_at json:updated_at`
 	FullName  string `db:full_name json:full_name validate:"empty=false`
@@ -12,6 +12,6 @@ type User struct {
 }
 
 type Role struct {
-	Id   int    `json:id db:id`
+	Id   string    `json:id db:id`
 	name string `json:name db:name`
 }

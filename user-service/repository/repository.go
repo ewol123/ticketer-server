@@ -54,7 +54,7 @@ func NewPgRepository(connectionString string) (user.Repository, error) {
 }
 
 // Find : find a user in the user db by id
-func (r *pgRepository) Find(id int) (*user.User, error) {
+func (r *pgRepository) Find(id string) (*user.User, error) {
 	 user := &user.User{}
 	 err := r.client.Get(user, `
 	 SELECT 

@@ -12,7 +12,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 
 	h "github.com/ewol123/ticketer-server/user-service/api"
-	pr "github.com/ewol123/ticketer-server/user-service/repository/postgres"
+	pr "github.com/ewol123/ticketer-server/user-service/repository"
 
 	"github.com/ewol123/ticketer-server/user-service/user"
 )
