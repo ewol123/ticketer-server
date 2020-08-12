@@ -1,11 +1,11 @@
-module main
+module github.com/ewol123/ticketer-server/user-service
 
 go 1.14
 
 require (
 	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/google/uuid v1.1.1
 	github.com/jackskj/carta v0.2.0
-	github.com/jmoiron/sqlx v1.2.0
 	github.com/lib/pq v1.8.0
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/pkg/errors v0.9.1
