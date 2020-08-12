@@ -1,12 +1,12 @@
 package postgres
 
 import (
-    "database/sql"
-    "fmt"
-    "log"
+	"database/sql"
 	"github.com/ewol123/ticketer-server/user-service/user"
-    _ "github.com/lib/pq"
-    "github.com/jackskj/carta"
+	"github.com/jackskj/carta"
+	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
+	"log"
 )
 
 type pgRepository struct {
@@ -16,13 +16,12 @@ type pgRepository struct {
 
 func newPgClient(connectionString string) (*sql.DB, error) {
 
-	db, err := sqlx.Connect("postgres", connectionString)
+	db, err := sql.Open("postgres", connectionString)
     if err != nil {
         return nil, err
 	}
 
-	user := user.User{}
-	err = db.Get(user, "SELECT * FROM user WHERE id=$1", 1)
+	_, err = db.Query("SELECT * FROM user WHERE id=$1", 1)
     if err != nil {
 		return nil, err
     }
@@ -54,8 +53,9 @@ func NewPgRepository(connectionString string) (user.Repository, error) {
 
 // Find : find a user in the user db by id
 func (r *pgRepository) Find(id string) (*user.User, error) {
-	 user := &user.User{}
-	 err := r.client.Get(user, `
+	 userModel := &user.User{}
+
+	 rows, err := r.client.Query(`
 	 SELECT 
 	 id AS user_id
 	 created_at AS user_created_at
@@ -80,20 +80,36 @@ func (r *pgRepository) Find(id string) (*user.User, error) {
 	 if err != nil {
 		return nil, errors.Wrap(err, "repository.User.Find")
 	 }
-	 if user.Id == 0 {
-		 return nil, errors.Wrap(user.ErrRedirectNotFound, "repository.user.Find")
+
+	 err = carta.Map(rows, &userModel)
+	 if err != nil {
+	 	return nil, errors.Wrap(err,"repository.user.Find")
 	 }
-	 return user, nil
+
+	 if userModel.Id == "" {
+		 return nil, errors.Wrap(user.ErrUserNotFound, "repository.user.Find")
+	 }
+	 return userModel, nil
 } 
 
 func (r *pgRepository) Store(user *user.User) error {
 
-	tx := db.MustBegin()
-	_, err =  tx.NamedExec("INSERT INTO user (full_name, email, password,created_at,updated_at) VALUES (:full_name, :email, :password, :created_at, :updated_at)", &user)
+	tx, err := r.client.Begin()
 	if err != nil {
 		return errors.Wrap(err, "repository.User.Store")
 	}
-	tx.Commit()
+
+	_, err =  tx.Exec("INSERT INTO user (full_name, email, password,created_at,updated_at) VALUES ($1,$2,$3,$4)", user.FullName,user.Email,user.Password,user.CreatedAt,user.UpdatedAt )
+	if err != nil {
+		log.Println(err)
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			return errors.Wrap(err, "repository.User.Store")
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return errors.Wrap(err, "repository.User.Store")
+	}
 	
 	return nil
 }
