@@ -56,8 +56,8 @@ func httpPort() string {
 	return fmt.Sprintf(":%s", port)
 }
 
-func chooseRepo() user.UserRepository {
-	var re user.UserRepository
+func chooseRepo() user.Repository {
+	var repo user.Repository
 	switch os.Getenv("URL_DB") {
 	/* case "redis":
 	redisURL := os.Getenv("REDIS_URL")
@@ -68,11 +68,11 @@ func chooseRepo() user.UserRepository {
 	re := repo */
 	case "postgres":
 		connectionString := os.Getenv("CONNECTION_STRING")
-		repo, err := pr.NewPgRepository(connectionString)
+		pgRepo, err := pr.NewPgRepository(connectionString)
 		if err != nil {
 			log.Fatal(err)
 		}
-		re = repo
+		repo = pgRepo
 	}
-	return re
+	return repo
 }
