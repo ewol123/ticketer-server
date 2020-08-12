@@ -2,9 +2,9 @@ package user
 
 import (
 	"errors"
-	"time"
-
+	"github.com/google/uuid"
 	validate "gopkg.in/dealancer/validate.v2"
+	"time"
 
 	errs "github.com/pkg/errors"
 )
@@ -27,7 +27,11 @@ func NewUserService(userRepo Repository) Service {
 }
 
 func (u *userService) Find(id string) (*User, error) {
-	return u.Find(id)
+	return u.userRepo.Find(id)
+}
+
+func (u *userService) FindAll(page int, rowsPerPage int, sortBy string, descending bool) (*[]User, int, error) {
+	return u.userRepo.FindAll(page,rowsPerPage,sortBy,descending)
 }
 
 func (u *userService) Store(user *User) error {
@@ -36,7 +40,22 @@ func (u *userService) Store(user *User) error {
 	}
 	user.CreatedAt = time.Now().UTC().Unix()
 	user.UpdatedAt = time.Now().UTC().Unix()
-
+	id, err := uuid.NewRandom()
+	if err != nil {
+		return errs.Wrap(err, "service.User.Store")
+	}
+	user.Id = id.String()
 	return u.userRepo.Store(user)
 
+}
+
+func (u *userService) Update(user *User) (*User, error) {
+	if err := validate.Validate(user); err != nil {
+		return nil, errs.Wrap(ErrUserInvalid, "service.User.Store")
+	}
+	return u.userRepo.Update(user)
+}
+
+func (u *userService) Delete(id string) error {
+	return u.userRepo.Delete(id)
 }
