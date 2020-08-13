@@ -5,6 +5,6 @@ type Repository interface {
 	Find(id string) (*User, error)
 	FindAll(page int, rowsPerPage int, sortBy string, descending bool) (*[]User, int, error)
 	Store(user *User) error
-	Update(user *User) (*User, error)
+	Update(user *User) error
 	Delete(id string) error
 }

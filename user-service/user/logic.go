@@ -49,10 +49,12 @@ func (u *userService) Store(user *User) error {
 
 }
 
-func (u *userService) Update(user *User) (*User, error) {
+func (u *userService) Update(user *User) error {
 	if err := validate.Validate(user); err != nil {
-		return nil, errs.Wrap(ErrUserInvalid, "service.User.Store")
+		return errs.Wrap(ErrUserInvalid, "service.User.Store")
 	}
+
+	user.UpdatedAt = time.Now().UTC().Unix()
 	return u.userRepo.Update(user)
 }
 
