@@ -88,10 +88,101 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	responseBody, err := h.serializer(contentType).Encode(userReq)
+
+	setupResponse(w, contentType, []byte{}, http.StatusCreated)
+}
+
+func (h *handler) Put(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	contentType := r.Header.Get("Content-Type")
+	requestBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	setupResponse(w, contentType, responseBody, http.StatusCreated)
+	userReq, err := h.serializer(contentType).Decode(requestBody)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	userReq.Id = id
+	userReq.Roles = []user.Role{} // we should pass domain logic service validation with an empty roles slice
+	userReq.Password = ""
+
+	if userReq.FullName == "" || userReq.Email == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err = h.userService.Update(userReq)
+	if err != nil {
+		if errors.Cause(err) == user.ErrUserInvalid {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		if errors.Cause(err) == user.ErrUserNotFound {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	setupResponse(w, contentType, []byte{}, http.StatusCreated)
+}
+
+func (h *handler) Patch(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	contentType := r.Header.Get("Content-Type")
+	requestBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	userReq, err := h.serializer(contentType).Decode(requestBody)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	userReq.Id = id
+	userReq.Roles = []user.Role{} // we should pass domain logic service validation with an empty roles slice
+	userReq.Password = ""
+
+	if userReq.FullName == "" && userReq.Email == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err = h.userService.Update(userReq)
+	if err != nil {
+		if errors.Cause(err) == user.ErrUserInvalid {
+			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			return
+		}
+		if errors.Cause(err) == user.ErrUserNotFound {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	setupResponse(w, contentType, []byte{}, http.StatusCreated)
+}
+
+func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	contentType := r.Header.Get("Content-Type")
+	err := h.userService.Delete(id)
+	if err != nil {
+		if errors.Cause(err) == user.ErrUserNotFound {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	setupResponse(w, contentType, []byte{}, http.StatusOK)
 }
