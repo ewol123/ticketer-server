@@ -48,14 +48,14 @@ func (r* newRepo) FindAll(page int, rowsPerPage int, sortBy string, descending b
 
 }
 
-func (r* newRepo) Update(user *User) (*User, error){
+func (r* newRepo) Update(user *User) error {
 	for i := range users {
 		if users[i].Id == user.Id {
 			users[i] = *user
-			return &users[i], nil
+			return nil
 		}
 	}
-	return nil, ErrUserNotFound
+	return ErrUserNotFound
 }
 
 func (r* newRepo) Delete(id string) error{
@@ -165,6 +165,80 @@ func TestStore(t *testing.T) {
 	} else {
 		t.Errorf("test user store invalid failed, expected %v, got %v", ErrUserInvalid, err)
 	}
+}
 
+func TestUpdate(t *testing.T) {
+	r := &newRepo{}
+	service := NewUserService(r)
+
+	updateUser := User{
+		Id:        "8a5e9658-f954-45c0-a232-4dcbca0d4907",
+		FullName:  "updated",
+		Email:     "updated@test.com",
+		Password:  "bcrypt2",
+		Roles:     roles,
+	}
+
+	invalidUser := User{
+		FullName: "hallo",
+	}
+
+	err := service.Update(&updateUser)
+
+	if err != nil{
+		t.Errorf("test user update failed, expected %v, got %v", nil, err)
+	} else {
+		t.Logf("test user update success, expected %v, got %v", nil, err)
+	}
+
+
+	shouldFind, err := service.Find("8a5e9658-f954-45c0-a232-4dcbca0d4907")
+
+	if err != nil {
+		t.Errorf("test user update failed, expected %v after update, got %v",updateUser, shouldFind)
+	} else {
+		if shouldFind.FullName != "updated" {
+			t.Errorf("test user update failed, expected FullName = %v after update, got %v",updateUser.FullName, shouldFind.FullName)
+		}
+		if shouldFind.Email != "updated@test.com"{
+			t.Errorf("test user update failed, expected Email = %v after update, got %v",updateUser.Email, shouldFind.Email)
+		}
+		if shouldFind.Password != "bcrypt2" {
+			t.Errorf("test user update failed, expected Password = %v after update, got %v",updateUser.Password, shouldFind.Password)
+		}
+			t.Logf("test user update success, all values are as expected")
+	}
+
+	err = service.Update(&invalidUser)
+
+	if err != nil{
+		t.Logf("test user update invalid success, expected %v, got %v", ErrUserInvalid, err)
+	} else {
+		t.Errorf("test user update invalid failed, expected %v, got %v", ErrUserInvalid, err)
+	}
+}
+
+func TestDelete(t *testing.T){
+	r := &newRepo{}
+	service := NewUserService(r)
+
+	err := service.Delete("8a5e9658-f954-45c0-a232-4dcbca0d4907")
+
+	if err != nil {
+		t.Errorf("test delete failed, expected %v, got %v", nil, err)
+	} else {
+		t.Logf("test delete success, expected %v, got %v", nil, err)
+	}
+
+
+	err = service.Delete("abc")
+
+	if err != nil {
+		if err != ErrUserNotFound {
+			t.Errorf("test delete failed, expected %v, got %v", ErrUserNotFound, err)
+		} else {
+			t.Logf("test delete success, expected %v, got %v", ErrUserNotFound, err)
+		}
+	}
 
 }
