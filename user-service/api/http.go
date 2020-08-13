@@ -15,7 +15,11 @@ import (
 // UserHandler : UserHandler interface with Get and Post methods
 type UserHandler interface {
 	Get(http.ResponseWriter, *http.Request)
+	GetAll(http.ResponseWriter, *http.Request)
 	Post(http.ResponseWriter, *http.Request)
+	Put(http.ResponseWriter, *http.Request)
+	Patch(http.ResponseWriter, *http.Request)
+	Delete(http.ResponseWriter, *http.Request)
 }
 
 type handler struct {
