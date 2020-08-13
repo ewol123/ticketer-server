@@ -28,8 +28,13 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
+	r.Get("/", handler.GetAll)
 	r.Get("/{id}", handler.Get)
 	r.Post("/", handler.Post)
+	r.Put("/{id}", handler.Put)
+	r.Patch("/{id}", handler.Patch)
+	r.Delete("/{id}", handler.Delete)
+
 
 	errs := make(chan error, 2)
 	go func() {
