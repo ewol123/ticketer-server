@@ -113,3 +113,62 @@ func (r *pgRepository) Store(user *user.User) error {
 	
 	return nil
 }
+
+func (r *pgRepository) Update(u *user.User) error {
+	tx, err := r.client.Begin()
+	if err != nil {
+		return errors.Wrap(err, "repository.User.Store")
+	}
+
+	response, err := tx.Exec(`UPDATE user 
+								SET 
+									full_name = case when $1 = '' THEN user.full_name ELSE $1 END,
+								    email = case when $2 = '' THEN user.email ELSE $2 END,
+								    password = case when $3 = '' THEN user.password ELSE $3 END 
+								FROM user WHERE user.id = $4`, u.FullName,u.Email,u.Password,u.Id)
+	if err != nil {
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			return errors.Wrap(err, "repository.User.Store")
+		}
+		return errors.Wrap(err, "repository.User.Store")
+	}
+
+	if err := tx.Commit(); err != nil {
+		return errors.Wrap(err, "repository.User.Store")
+	}
+
+	rowsAffected,err := response.RowsAffected()
+
+	if err != nil {
+		return errors.Wrap(err, "repository.User.Store")
+	}
+
+	if rowsAffected == 0 {
+		return errors.Wrap(user.ErrUserNotFound, "repository.User.Store")
+	}
+
+	return nil
+
+}
+
+func (r *pgRepository) Delete(id string) error {
+	tx, err := r.client.Begin()
+	if err != nil {
+		return errors.Wrap(err, "repository.User.Store")
+	}
+
+	_, err = tx.Exec("DELETE FROM user WHERE user.id = $1", id)
+
+	if err != nil {
+		log.Println(err)
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			return errors.Wrap(err, "repository.User.Store")
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return errors.Wrap(err, "repository.User.Store")
+	}
+
+	return nil
+}
