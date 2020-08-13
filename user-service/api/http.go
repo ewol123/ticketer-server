@@ -47,6 +47,10 @@ func NewHandler(userService user.Service) UserHandler {
 	return &handler{userService: userService}
 }
 
+func (h *handler) GetAll(writer http.ResponseWriter, request *http.Request) {
+	panic("implement me")
+}
+
 // Get : get a single user by id
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")

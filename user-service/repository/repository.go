@@ -14,6 +14,7 @@ type pgRepository struct {
 	connString string
 }
 
+
 func newPgClient(connectionString string) (*sql.DB, error) {
 
 	db, err := sql.Open("postgres", connectionString)
@@ -90,7 +91,11 @@ func (r *pgRepository) Find(id string) (*user.User, error) {
 		 return nil, errors.Wrap(user.ErrUserNotFound, "repository.user.Find")
 	 }
 	 return userModel, nil
-} 
+}
+
+func (r *pgRepository) FindAll(page int, rowsPerPage int, sortBy string, descending bool) (*[]user.User, int, error) {
+	panic("implement me")
+}
 
 func (r *pgRepository) Store(user *user.User) error {
 
