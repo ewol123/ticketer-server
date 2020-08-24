@@ -2,7 +2,6 @@ package json
 
 import (
 	"encoding/json"
-
 	"github.com/ewol123/ticketer-server/user-service/user"
 	"github.com/pkg/errors"
 )
@@ -21,9 +20,19 @@ func (r *User) Decode(input []byte) (*user.User, error) {
 
 // Encode : encode our input to bytes
 func (r *User) Encode(input *user.User) ([]byte, error) {
-	rawMsg, err := json.Marshal(input)
+	raw, err := json.Marshal(input)
 	if err != nil {
 		return nil, errors.Wrap(err, "serializer.User.Encode")
 	}
-	return rawMsg, nil
+	return raw, nil
+}
+
+// EncodeAll : encode any interface to bytes
+func (r *User) EncodeAll(input interface{}) ([]byte, error) {
+	raw, err := json.Marshal(input)
+	if err != nil {
+		return nil, errors.Wrap(err, "serializer.User.EncodeAll")
+	}
+
+	return raw, nil
 }
