@@ -54,7 +54,7 @@ func NewPgRepository(connectionString string) (user.Repository, error) {
 
 // Find : find a user in the user db by id
 func (r *pgRepository) Find(id string) (*user.User, error) {
-	 userModel := &user.User{}
+	 userModel := user.User{}
 
 	 rows, err := r.client.Query(`
 	 SELECT 
@@ -90,11 +90,58 @@ func (r *pgRepository) Find(id string) (*user.User, error) {
 	 if userModel.Id == "" {
 		 return nil, errors.Wrap(user.ErrUserNotFound, "repository.user.Find")
 	 }
-	 return userModel, nil
+	 return &userModel, nil
 }
 
-func (r *pgRepository) FindAll(page int, rowsPerPage int, sortBy string, descending bool) (*[]user.User, int, error) {
-	panic("implement me")
+func (r *pgRepository) FindAll(page int, rowsPerPage int, sortBy string, descending bool, filter string) (*[]user.User, int, error) {
+	var users []user.User
+	var desc string
+	var whereQuery string
+
+	offsetPage := page - 1
+	offset := offsetPage * rowsPerPage
+
+	if descending {
+		desc = "DESC"
+	} else {
+		desc = "ASC"
+	}
+
+	if filter != "" {
+		whereQuery = `WHERE (user.first_name ILIKE '%`+filter+`%') OR (user.last_name ILIKE '%`+filter+`%')`
+	} else {
+		whereQuery = `WHERE true`
+	}
+
+	rows, err := r.client.Query(`
+	WITH cte AS (SELECT
+	"user".*
+	FROM user
+	$1
+	)
+	SELECT *
+	FROM(
+	   TABLE  cte
+	   ORDER  BY "cte"."$2" $3
+	   LIMIT  $4
+	   OFFSET $5
+	   ) sub  
+	RIGHT JOIN (SELECT count(*) FROM cte) c(full_count) ON true;
+	`, whereQuery, sortBy, desc,rowsPerPage,offset)
+
+
+	if err != nil {
+		return nil, 0, errors.Wrap(err, "repository.User.Find")
+	}
+
+	err = carta.Map(rows, &users )
+
+	if err != nil {
+		return nil, 0, errors.Wrap(err,"repository.user.Find")
+	}
+
+	return &users, 1, nil
+
 }
 
 func (r *pgRepository) Store(user *user.User) error {
