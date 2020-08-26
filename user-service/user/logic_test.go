@@ -7,22 +7,19 @@ import (
 
 var user = User{
 	Id:        "8a5e9658-f954-45c0-a232-4dcbca0d4907",
-	CreatedAt: 0,
-	UpdatedAt: 0,
 	FullName:  "Test User",
 	Email:     "test.user@test.com",
 	Password:  "bcrypt",
-	Roles:     roles,
 }
+
 
 var users = []User{
 	user,
 }
 
 var roles  = []Role{
-	{Id: "7e3d3e49-b884-4803-852c-086f3a00b8ac", Name: "user" },
-	{Id: "ef675295-68e2-4c8e-bf41-e05c99a46364", Name: "admin" },
-
+	{ Id: "72daf87a-fda4-4c72-aff9-85edd68d155f", Name: "user" },
+	{ Id: "336a3ff6-9fdb-496f-ac8c-e37759969cf2", Name: "admin" },
 }
 
 type newRepo struct {}
@@ -36,7 +33,7 @@ func (r* newRepo) Find(id string) (*User, error) {
 	return nil, ErrUserNotFound
 }
 
-func (r* newRepo) FindAll(page int, rowsPerPage int, sortBy string, descending bool) (*[]User, int, error){
+func (r* newRepo) FindAll(page int, rowsPerPage int, sortBy string, descending bool, filter string) (*[]User, int, error){
 	offsetPage := page - 1
 
 	if rowsPerPage * page > len(users) -1 {
@@ -70,9 +67,9 @@ func (r* newRepo) Delete(id string) error{
 	return ErrUserNotFound
 }
 
-func (r* newRepo) Store(user *User) error {
+func (r* newRepo) Store(user *User) (*User, error) {
 	users = append(users, *user)
-	return nil
+	return user, nil
 }
 
 
@@ -118,7 +115,6 @@ func TestFind(t *testing.T){
 		t.Errorf("test if found failed, expected %v, got %v", user, shouldFind)
 	} else {
 		t.Logf("test if found success, expected %v, got %v", user, shouldFind)
-
 	}
 
 	_, err = service.Find("abc")
@@ -138,8 +134,6 @@ func TestStore(t *testing.T) {
 
 	newUser := User{
 		Id:        "94996a7a-312d-405b-9376-eb1850359632",
-		CreatedAt: 0,
-		UpdatedAt: 0,
 		FullName:  "test 2",
 		Email:     "test2@test.com",
 		Password:  "bcrypt2",
@@ -150,15 +144,15 @@ func TestStore(t *testing.T) {
 		FullName: "hallo",
 	}
 	
-	err := service.Store(&newUser)
+	user, err := service.Store(&newUser)
 
 	if err != nil{
 		t.Errorf("test user store failed, expected %v, got %v", nil, err)
 	} else {
-		t.Logf("test user store success, expected %v, got %v", nil, err)
+		t.Logf("test user store success, expected %v, got %v", user, user)
 	}
 
-	err = service.Store(&invalidUser)
+	user, err = service.Store(&invalidUser)
 
 	if err != nil{
 		t.Logf("test user store invalid success, expected %v, got %v", ErrUserInvalid, err)
