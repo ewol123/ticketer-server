@@ -12,7 +12,10 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pressly/goose v2.6.0+incompatible // indirect
 	github.com/rakyll/gotest v0.0.5 // indirect
+	github.com/sendgrid/rest v2.6.1+incompatible // indirect
+	github.com/sendgrid/sendgrid-go v3.6.2+incompatible // indirect
 	github.com/ziutek/mymysql v1.5.4 // indirect
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/sys v0.0.0-20200810151505-1b9f1253b3ed // indirect
 	gopkg.in/dealancer/validate.v2 v2.1.0
 )
