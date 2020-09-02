@@ -3,7 +3,9 @@ module github.com/ewol123/ticketer-server/user-service
 go 1.14
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-chi/jwtauth v4.0.4+incompatible // indirect
 	github.com/google/uuid v1.1.1
 	github.com/jackskj/carta v0.2.0
 	github.com/lib/pq v1.8.0
@@ -15,7 +17,7 @@ require (
 	github.com/sendgrid/rest v2.6.1+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.6.2+incompatible // indirect
 	github.com/ziutek/mymysql v1.5.4 // indirect
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	golang.org/x/sys v0.0.0-20200810151505-1b9f1253b3ed // indirect
 	gopkg.in/dealancer/validate.v2 v2.1.0
 )
