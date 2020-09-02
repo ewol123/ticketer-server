@@ -4,9 +4,9 @@ import (
 	"time"
 )
 
-type RoleType string
-type StatusType string
 
+// StatusType : represents allowed user statuses
+type StatusType string
 const (
 	PENDING StatusType = "pending"
 	ACTIVE StatusType = "active"
@@ -30,10 +30,11 @@ type User struct {
 	Password  string `migrations:"password" json:"password" validate:"empty=false" db:"user_password"`
 	Status	  StatusType `migrations:"status" json:"status" db:"user_status"`
 	RegistrationCode string `migrations:"registration_code" json:"registration_code" db:"user_registration_code"`
+	ResetPasswordCode string  `migrations:"reset_password_code" json:"reset_password_code" db:"user_reset_password_code"`
 	Roles     []Role `json:"roles"`
 }
-
+// Role : role model
 type Role struct {
-	Id   RoleType    `json:"id" migrations:"id" db:"roles_id"`
+	Id   string    `json:"id" migrations:"id" db:"roles_id"`
 	Name string `json:"name" migrations:"name" db:"roles_name"`
 }
