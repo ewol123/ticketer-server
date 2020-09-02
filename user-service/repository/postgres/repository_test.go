@@ -61,7 +61,7 @@ func TestFind(t *testing.T){
 		t.Errorf("test new pg repository failed, expected %v, got %v", nil, err)
 	}
 
-	rows, err := repo.Find("8a5e9658-f954-45c0-a232-4dcbca0d4907")
+	rows, err := repo.Find("id","8a5e9658-f954-45c0-a232-4dcbca0d4907")
 
 	if err != nil {
 		t.Errorf("test repository find failed, expected %v, got %v", usr, err)

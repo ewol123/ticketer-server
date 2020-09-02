@@ -53,11 +53,12 @@ func NewPgRepository(connectionString string) (user.Repository, error) {
 	return repo, nil
 }
 
-// Find : find a user in the user migrations by id
-func (r *pgRepository) Find(id string) (*user.User, error) {
+// Find : find a user in the user migrations by column
+func (r *pgRepository) Find(column string, value string) (*user.User, error) {
 	 userModel := user.User{}
 
-	 rows, err := r.client.Query(`
+
+	 query := fmt.Sprintf(`
 	 SELECT 
 	 "user"."id" AS user_id,
 	 created_at AS user_created_at,
@@ -65,7 +66,8 @@ func (r *pgRepository) Find(id string) (*user.User, error) {
 	 full_name AS user_full_name,
 	 email AS user_email,
 	 password AS user_password,
-	 registration_code AS user_registration_code,
+	 CASE WHEN registration_code IS NULL THEN '' ELSE registration_code END AS user_registration_code,
+	 CASE WHEN reset_password_code IS NULL THEN '' ELSE reset_password_code END AS user_reset_password_code,
 	 status AS user_status,
 	 r.id AS roles_id,
 	 r.name AS roles_name
@@ -80,7 +82,9 @@ func (r *pgRepository) Find(id string) (*user.User, error) {
 		INNER JOIN 
 		"public"."user_role" ON role.id = user_role.role_id )r 
 		ON "user"."id" = r.user_id
-		WHERE "user"."id" = $1`, id)
+		WHERE "user"."%v" = '%v';`,column,value)
+
+	 rows, err := r.client.Query(query)
 	 if err != nil {
 		return nil, errors.Wrap(err, "repository.User.Find")
 	 }
@@ -189,7 +193,10 @@ func (r *pgRepository) Store(u *user.User) (*user.User, error) {
 		return nil, errors.Wrap(err, "repository.User.Store")
 	}
 
-	_, err = tx.Exec(`INSERT INTO user_role (user_id,role_id) VALUES($1,$2)`,u.Id, user.USER)
+
+
+
+	_, err = tx.Exec(`INSERT INTO user_role (user_id,role_id) VALUES($1,$2)`,u.Id, user.USER.Id)
 	if err != nil {
 		log.Println(err)
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
