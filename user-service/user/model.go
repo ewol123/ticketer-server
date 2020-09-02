@@ -13,10 +13,12 @@ const (
 	INACTIVE StatusType = "inactive"
 )
 
-const (
-	USER RoleType = "72daf87a-fda4-4c72-aff9-85edd68d155f"
-	ADMIN RoleType = "336a3ff6-9fdb-496f-ac8c-e37759969cf2"
+var (
+	USER = Role{Id: "72daf87a-fda4-4c72-aff9-85edd68d155f", Name: "user"}
+	ADMIN  = Role{Id: "336a3ff6-9fdb-496f-ac8c-e37759969cf2", Name: "admin"}
 	)
+
+
 
 // User : user model
 type User struct {
