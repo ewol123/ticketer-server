@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/fatih/structs v1.1.0
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/jwtauth v4.0.4+incompatible // indirect
 	github.com/google/uuid v1.1.1
@@ -11,6 +12,7 @@ require (
 	github.com/lib/pq v1.8.0
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mattn/go-sqlite3 v1.14.1 // indirect
+	github.com/mitchellh/mapstructure v1.3.3
 	github.com/pkg/errors v0.9.1
 	github.com/pressly/goose v2.6.0+incompatible // indirect
 	github.com/rakyll/gotest v0.0.5 // indirect
