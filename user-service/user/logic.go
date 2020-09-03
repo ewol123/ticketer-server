@@ -168,12 +168,8 @@ func (u *userService) ConfirmRegistration(model *ConfirmRegistrationRequestModel
 		RegistrationCode: "",
 	}
 
-	err = u.userRepo.Update(&updateUser)
+	return u.userRepo.Update(&updateUser)
 
-	if err != nil {
-		return errs.Wrap(err, "service.User.ConfirmRegistration")
-	}
-	return nil
 }
 
 func (u *userService) Login(model *LoginRequestModel) (*LoginResponseModel, error) {
@@ -270,12 +266,7 @@ func (u *userService) ResetPassword(model *ResetPasswordRequestModel) error {
 		Password: string(hashedPassword),
 	}
 
-	err = u.userRepo.Update(&updateUser)
-
-	if err != nil {
-		return errs.Wrap(err, "service.User.ConfirmRegistration")
-	}
-	return nil
+	return u.userRepo.Update(&updateUser)
 
 }
 
