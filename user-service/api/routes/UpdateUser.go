@@ -1,4 +1,4 @@
-package api
+package routes
 
 import (
 	"github.com/ewol123/ticketer-server/user-service/user"
@@ -7,15 +7,14 @@ import (
 	"net/http"
 )
 
-func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
 	contentType := r.Header.Get("Content-Type")
 
-	deleteRequestModel := user.DeleteUserRequestModel{Id: id}
+	updateRequestModel := user.UpdateUserRequestModel{Id: id}
 
-
-	err := h.userService.DeleteUser(&deleteRequestModel)
+	err := h.userService.UpdateUser(&updateRequestModel)
 	if err != nil {
 		if errors.Cause(err) == user.ErrUserInvalid {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -33,6 +32,5 @@ func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-	setupResponse(w, contentType, []byte{}, http.StatusOK)
+	setupResponse(w, contentType, []byte{}, http.StatusNoContent)
 }

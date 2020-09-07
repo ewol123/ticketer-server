@@ -1,36 +1,54 @@
-package api
+package routes
 
 import (
-	"github.com/ewol123/ticketer-server/user-service/serializer/mapdecoder"
 	"github.com/ewol123/ticketer-server/user-service/user"
+	"github.com/fatih/structs"
 	"github.com/pkg/errors"
-	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
-func (h *handler) ResetPassword(w http.ResponseWriter, r *http.Request) {
+type GetAllUserResponseModel struct {
+	count int
+	rows *[]user.User
+}
+
+func (h *handler) GetAllUser(w http.ResponseWriter, r *http.Request) {
+
 	contentType := r.Header.Get("Content-Type")
-	requestBody, err := ioutil.ReadAll(r.Body)
+	queryParams := r.URL.Query()
+
+
+	page, err := strconv.Atoi(queryParams.Get("page"))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-
-	userReq, err := h.serializer(contentType).Decode(requestBody)
+	rowsPerPage, err := strconv.Atoi(queryParams.Get("rowsPerPage"))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-
-	resetPwModel := &user.ResetPasswordRequestModel{}
-	err = mapdecoder.Decode(*userReq, &resetPwModel)
+	descending,err := strconv.ParseBool(queryParams.Get("descending"))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+	sortBy := queryParams.Get("sortBy")
+	filter := queryParams.Get("filter")
 
-	 err = h.userService.ResetPassword(resetPwModel)
-	 if err != nil {
+
+	getAllRequestModel := user.GetAllUserRequestModel{
+		Page:        page,
+		RowsPerPage: rowsPerPage,
+		SortBy:      sortBy,
+		Descending:  descending,
+		Filter:      filter,
+	}
+
+
+	res, err := h.userService.GetAllUser(&getAllRequestModel)
+	if err != nil {
 		if errors.Cause(err) == user.ErrUserInvalid {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
@@ -45,7 +63,16 @@ func (h *handler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
-		}
+	}
 
-	setupResponse(w, contentType, []byte{}, http.StatusOK)
+	newMap := structs.Map(res)
+
+	responseBody, err := h.serializer(contentType).Encode(&newMap)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+
+	setupResponse(w, contentType, responseBody, http.StatusOK)
 }

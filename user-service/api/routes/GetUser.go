@@ -1,22 +1,24 @@
-package api
+package routes
 
 import (
 	"github.com/ewol123/ticketer-server/user-service/user"
+	"github.com/fatih/structs"
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
 	"net/http"
 )
 
-func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
+// Get : get a single user by id
+func (h *handler) GetUser(w http.ResponseWriter, r *http.Request) {
+
 
 	id := chi.URLParam(r, "id")
 	contentType := r.Header.Get("Content-Type")
 
+	findRequestModel := user.GetUserRequestModel{Id: id}
 
-	updateRequestModel := user.UpdateUserRequestModel{Id: id}
 
-
-	err := h.userService.UpdateUser(&updateRequestModel)
+	res, err := h.userService.GetUser(&findRequestModel)
 	if err != nil {
 		if errors.Cause(err) == user.ErrUserInvalid {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -34,5 +36,15 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	setupResponse(w, contentType, []byte{}, http.StatusNoContent)
+	newMap := structs.Map(res)
+
+
+	responseBody, err := h.serializer(contentType).Encode(&newMap)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+
+	setupResponse(w, contentType, responseBody, http.StatusOK)
 }
