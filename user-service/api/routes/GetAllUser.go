@@ -8,11 +8,6 @@ import (
 	"strconv"
 )
 
-type GetAllUserResponseModel struct {
-	count int
-	rows *[]user.User
-}
-
 func (h *handler) GetAllUser(w http.ResponseWriter, r *http.Request) {
 
 	contentType := r.Header.Get("Content-Type")
