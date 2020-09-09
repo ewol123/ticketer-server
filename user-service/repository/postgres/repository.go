@@ -224,8 +224,9 @@ func (r *pgRepository) Update(u *user.User) error {
 	email = case when $2 = '' THEN "user"."email" ELSE $2 END,
 	password = case when $3 = '' THEN "user"."password" ELSE $3 END,
 	registration_code = case when $4 = '' THEN "user"."registration_code" ELSE $4 END,
-	status = case when $5 = '' THEN "user"."status" ELSE $5 END
-FROM user u WHERE "user"."id" = $6`, u.FullName,u.Email,u.Password,u.RegistrationCode, u.Status,u.Id)
+	reset_password_code = case when $5 = '' THEN "user"."reset_password_code" ELSE $5 END,
+	status = case when $6 = '' THEN "user"."status" ELSE $6 END
+FROM user u WHERE "user"."id" = $7`, u.FullName,u.Email,u.Password,u.RegistrationCode, u.ResetPasswordCode, u.Status,u.Id)
 	if err != nil {
 		log.Println(err)
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
