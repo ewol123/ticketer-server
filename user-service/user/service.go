@@ -48,8 +48,8 @@ type GetAllUserResponseModel struct {
 
 type UpdateUserRequestModel struct {
 	Id 		  string `validate:"empty=false"`
-	FullName  string `validate:"empty=false"`
-	Email     string `validate:"empty=false & format=email"`
+	FullName  string
+	Email     string `validate:"format=email"`
 	Status	  StatusType
 }
 
