@@ -2,12 +2,11 @@ package routes
 
 import (
 	"encoding/json"
+	"github.com/ewol123/ticketer-server/user-service/hack"
+	"github.com/ewol123/ticketer-server/user-service/user"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/ewol123/ticketer-server/user-service/hack"
-	"github.com/ewol123/ticketer-server/user-service/user"
 )
 
 func TestGetAllUserBadRequest(t *testing.T) {

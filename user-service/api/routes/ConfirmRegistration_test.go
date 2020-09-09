@@ -1,13 +1,12 @@
 package routes
 
 import (
+	"github.com/ewol123/ticketer-server/user-service/hack"
+	"github.com/ewol123/ticketer-server/user-service/user"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	seed "github.com/ewol123/ticketer-server/user-service/hack"
-	"github.com/ewol123/ticketer-server/user-service/user"
 )
 
 func TestConfirmRegistrationBadRequest(t *testing.T) {

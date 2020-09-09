@@ -2,29 +2,34 @@ package routes
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/ewol123/ticketer-server/user-service/hack"
 	"github.com/ewol123/ticketer-server/user-service/user"
 	"github.com/go-chi/chi"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
-func TestGetUserBadRequest(t *testing.T) {
+func TestUpdateUserBadRequest(t *testing.T) {
 	hack.Init("../../hack/seed_test.sql")
-
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
 	h := NewHandler(service)
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(h.GetUser)
-	req, err := http.NewRequest("GET", "/user/v1/asd", nil)
+	handler := http.HandlerFunc(h.UpdateUser)
+
+	req, err := http.NewRequest("PATCH", "/user/v1/",
+		strings.NewReader(`{"Email":"something.com"}`))
+	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
-		t.Errorf("GetUser test failed, error: %v", err)
+		t.Errorf("UpdateUser test failed, error: %v", err)
 	}
 
+	ctx := chi.NewRouteContext()
+	ctx.URLParams.Add("id", "f46c0b06-ec6c-45e1-8619-27e14c3ed92d")
+	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, ctx))
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusBadRequest {
@@ -35,23 +40,22 @@ func TestGetUserBadRequest(t *testing.T) {
 	}
 }
 
-func TestGetUserNotFound(t *testing.T) {
+func TestUpdateUserNotFound(t *testing.T) {
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
 	h := NewHandler(service)
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(h.GetUser)
-	req, err := http.NewRequest("GET", "/user/v1/", nil)
+	handler := http.HandlerFunc(h.UpdateUser)
+	req, err := http.NewRequest("PATCH", "/user/v1/",
+		strings.NewReader(`{"Email":"test.fail@test.com"}`))
 	if err != nil {
-		t.Errorf("GetUser test failed, error: %v", err)
+		t.Errorf("UpdateUser test failed, error: %v", err)
 	}
 
 	ctx := chi.NewRouteContext()
-	ctx.URLParams.Add("id", "c655b6b9-3956-4ee9-910a-2560e8e49d6e")
-
+	ctx.URLParams.Add("id", "f46c0b06-ec6c-45e1-4619-27e14d3ed92d")
 	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, ctx))
-
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusNotFound {
@@ -62,45 +66,32 @@ func TestGetUserNotFound(t *testing.T) {
 	}
 }
 
-func TestGetUserFound(t *testing.T) {
+func TestUpdateUser(t *testing.T) {
 
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
 	h := NewHandler(service)
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(h.GetUser)
-	req, err := http.NewRequest("GET", "/user/v1/", nil)
+	handler := http.HandlerFunc(h.UpdateUser)
+	req, err := http.NewRequest("PATCH", "/user/v1/",
+		strings.NewReader(`{"Email":"test_new@test.com","FullName": "test new", "Status": "active"}`))
 	if err != nil {
-		t.Errorf("GetUser test failed, error: %v", err)
+		t.Errorf("UpdateUser test failed, error: %v", err)
 	}
 
 	ctx := chi.NewRouteContext()
-	ctx.URLParams.Add("id", "e66c0b06-ec6c-45e1-8619-27e14c3ed92d")
+	ctx.URLParams.Add("id", "f46c0b06-ec6c-45e1-8619-27e14c3ed92d")
 	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, ctx))
 	handler.ServeHTTP(rr, req)
 
 	// check status
-	if status := rr.Code; status != http.StatusOK {
+	if status := rr.Code; status != http.StatusNoContent {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+			status, http.StatusNoContent)
 	} else {
-		t.Logf("handler returned correct status code: got %v want %v", status, http.StatusOK)
+		t.Logf("handler returned correct status code: got %v want %v", status, http.StatusNoContent)
 	}
 
-	// check response body
-	m := make(map[string]interface{})
-	if err := json.Unmarshal(rr.Body.Bytes(), &m); err != nil {
-		t.Errorf("cannot decode response body of GetUser %v", err)
-	}
-
-	isEqual := m["Email"] == "peti@test.com" && m["FullName"] == "peti" && m["RegistrationCode"] == ""
-
-	if isEqual != true {
-		t.Errorf("handler returned wrong response body")
-	} else {
-		t.Logf("handler returned correct response body")
-	}
 	hack.TearDown()
-
 }
