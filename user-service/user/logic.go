@@ -139,6 +139,10 @@ func (u *userService) Register(model *RegisterRequestModel) (*RegisterReturnMode
 
 	_, err = u.userRepo.Store(&user)
 
+	if err != nil {
+		return nil, errs.Wrap(err, "service.User.Register")
+	}
+
 	regReturnModel := RegisterReturnModel{
 		Id: id.String(),
 		RegistrationCode: regCode,
