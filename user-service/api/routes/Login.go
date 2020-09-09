@@ -65,7 +65,7 @@ func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tokenMap := make(map[string]interface{})
-	tokenMap["token"] = tokenString
+	tokenMap["Token"] = tokenString
 
 	bytes, err := h.serializer(contentType).Encode(&tokenMap)
 
