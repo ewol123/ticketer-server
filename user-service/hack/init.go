@@ -1,4 +1,4 @@
-package seed
+package hack
 
 import (
 	"database/sql"
