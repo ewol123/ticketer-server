@@ -1,16 +1,17 @@
 package routes
 
 import (
-	"github.com/ewol123/ticketer-server/user-service/repository/postgres/seed"
-	"github.com/ewol123/ticketer-server/user-service/user"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	seed "github.com/ewol123/ticketer-server/user-service/hack"
+	"github.com/ewol123/ticketer-server/user-service/user"
 )
 
 func TestConfirmRegistrationBadRequest(t *testing.T) {
-	seed.Init("../../repository/postgres/seed/seed_test.sql")
+	hack.Init("../../hack/seed_test.sql")
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
 	h := NewHandler(service)
@@ -35,7 +36,7 @@ func TestConfirmRegistrationBadRequest(t *testing.T) {
 	}
 }
 
-func TestConfirmRegistrationNotFound(t *testing.T){
+func TestConfirmRegistrationNotFound(t *testing.T) {
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
 	h := NewHandler(service)
@@ -58,7 +59,7 @@ func TestConfirmRegistrationNotFound(t *testing.T){
 	}
 }
 
-func TestConfirmRegistration(t *testing.T){
+func TestConfirmRegistration(t *testing.T) {
 
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
@@ -81,5 +82,5 @@ func TestConfirmRegistration(t *testing.T){
 	} else {
 		t.Logf("handler returned correct status code: got %v want %v", status, http.StatusOK)
 	}
-	seed.TearDown()
+	hack.TearDown()
 }

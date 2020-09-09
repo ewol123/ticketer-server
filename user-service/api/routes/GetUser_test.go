@@ -3,18 +3,17 @@ package routes
 import (
 	"context"
 	"encoding/json"
-	"github.com/ewol123/ticketer-server/user-service/repository/postgres/seed"
-	"github.com/ewol123/ticketer-server/user-service/user"
-	"github.com/go-chi/chi"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/ewol123/ticketer-server/user-service/hack"
+	"github.com/ewol123/ticketer-server/user-service/user"
+	"github.com/go-chi/chi"
 )
 
-
-
 func TestGetUserBadRequest(t *testing.T) {
-	seed.Init("../../repository/postgres/seed/seed_test.sql")
+	hack.Init("../../hack/seed_test.sql")
 
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
@@ -37,7 +36,7 @@ func TestGetUserBadRequest(t *testing.T) {
 	}
 }
 
-func TestGetUserNotFound(t *testing.T){
+func TestGetUserNotFound(t *testing.T) {
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
 	h := NewHandler(service)
@@ -64,7 +63,7 @@ func TestGetUserNotFound(t *testing.T){
 	}
 }
 
-func TestGetUserFound(t *testing.T){
+func TestGetUserFound(t *testing.T) {
 
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
@@ -103,5 +102,6 @@ func TestGetUserFound(t *testing.T){
 	} else {
 		t.Logf("handler returned correct response body")
 	}
-	seed.TearDown()
+	hack.TearDown()
+
 }

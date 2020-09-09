@@ -2,16 +2,16 @@ package routes
 
 import (
 	"encoding/json"
-	"github.com/ewol123/ticketer-server/user-service/repository/postgres/seed"
-	"github.com/ewol123/ticketer-server/user-service/user"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/ewol123/ticketer-server/user-service/hack"
+	"github.com/ewol123/ticketer-server/user-service/user"
 )
 
-
 func TestGetAllUserBadRequest(t *testing.T) {
-	seed.Init("../../repository/postgres/seed/seed_test.sql")
+	hack.Init("../../hack/seed_test.sql")
 
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
@@ -39,7 +39,7 @@ func TestGetAllUserBadRequest(t *testing.T) {
 	}
 }
 
-func TestGetAllUserFound(t *testing.T){
+func TestGetAllUserFound(t *testing.T) {
 
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
@@ -76,10 +76,11 @@ func TestGetAllUserFound(t *testing.T){
 	}
 
 	if m["Count"] != 0 {
-		t.Logf("respone body looks OK %v",m)
+		t.Logf("respone body looks OK %v", m)
 	} else {
 		t.Errorf("response body incorrect")
 	}
 
-	seed.TearDown()
+	hack.TearDown()
+
 }
