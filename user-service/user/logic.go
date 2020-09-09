@@ -95,8 +95,8 @@ func (u *userService) GetAllUser(model *GetAllUserRequestModel) (*GetAllUserResp
 	}
 
 	getAllUserResponseModel := GetAllUserResponseModel{
-		count: count,
-		rows:  getUserResponseModels,
+		Count: count,
+		Rows:  getUserResponseModels,
 	}
 
 	return &getAllUserResponseModel, nil

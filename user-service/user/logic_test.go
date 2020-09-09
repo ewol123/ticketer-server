@@ -260,16 +260,16 @@ func TestGetAllUser(t *testing.T){
 		t.Errorf("test GetAllUser failed, expected %v, got %v", "GetAllUserResponseModel", err)
 	}
 
-	if shouldFind.rows[0].Id != "8a5e9658-f954-45c0-a232-4dcbca0d4907" {
-		t.Errorf("test GetAllUser failed, expected %v, got %v", "8a5e9658-f954-45c0-a232-4dcbca0d4907", shouldFind.rows[0].Id)
+	if shouldFind.Rows[0].Id != "8a5e9658-f954-45c0-a232-4dcbca0d4907" {
+		t.Errorf("test GetAllUser failed, expected %v, got %v", "8a5e9658-f954-45c0-a232-4dcbca0d4907", shouldFind.Rows[0].Id)
 	} else {
-		t.Logf("test GetAllUser success, expected %v, got %v", "8a5e9658-f954-45c0-a232-4dcbca0d4907",  shouldFind.rows[0].Id)
+		t.Logf("test GetAllUser success, expected %v, got %v", "8a5e9658-f954-45c0-a232-4dcbca0d4907",  shouldFind.Rows[0].Id)
 	}
 
-	if shouldFind.count > 0 {
-		t.Logf("test GetALlUser success, expected %v, got %v", "greater than zero", shouldFind.count)
+	if shouldFind.Count > 0 {
+		t.Logf("test GetALlUser success, expected %v, got %v", "greater than zero", shouldFind.Count)
 	} else {
-		t.Errorf("test GetAllUser failed, expected %v, got %v", "greater than zero", shouldFind.count)
+		t.Errorf("test GetAllUser failed, expected %v, got %v", "greater than zero", shouldFind.Count)
 	}
 
 
