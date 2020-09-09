@@ -94,7 +94,7 @@ func Run() UserHandler {
 		r.Use(middlewares.AdminAuthenticator)
 		r.Get(AppVersion+ "/", handler.GetAllUser)
 		r.Get(AppVersion+ "/{id}", handler.GetUser)
-		r.Put(AppVersion+ "/{id}", handler.UpdateUser)
+		r.Patch(AppVersion+ "/{id}", handler.UpdateUser)
 		r.Delete(AppVersion+ "/{id}", handler.DeleteUser)
 
 
