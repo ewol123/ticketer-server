@@ -20,7 +20,7 @@ func UserAuthenticator(next http.Handler) http.Handler {
 	return
 	}
 
-	if claims["user"] != true {
+	if claims["user"] != true && claims["worker"] != true {
 	http.Error(w, http.StatusText(401), 401)
 	return
 	}
