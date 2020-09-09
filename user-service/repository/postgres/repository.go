@@ -266,7 +266,7 @@ func (r *pgRepository) Delete(id string) error {
 		return errors.Wrap(err, "repository.User.Delete")
 	}
 
-	_, err = tx.Exec(`DELETE FROM "user" WHERE "user"."id" = $1`, id)
+	res, err := tx.Exec(`DELETE FROM "user" WHERE "user"."id" = $1`, id)
 	if err != nil {
 		log.Println(err)
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
@@ -277,6 +277,16 @@ func (r *pgRepository) Delete(id string) error {
 
 	if err := tx.Commit(); err != nil {
 		return errors.Wrap(err, "repository.User.Delete")
+	}
+
+	rowsAffected,err := res.RowsAffected()
+
+	if err != nil {
+		return errors.Wrap(err, "repository.User.Delete")
+	}
+
+	if rowsAffected == 0 {
+		return errors.Wrap(user.ErrUserNotFound, "repository.User.Delete")
 	}
 
 	return nil
