@@ -42,8 +42,8 @@ type GetAllUserRequestModel struct{
 	Filter string
 }
 type GetAllUserResponseModel struct {
-	count int
-	rows []GetUserResponseModel
+	Count int
+	Rows []GetUserResponseModel
 }
 
 type UpdateUserRequestModel struct {
