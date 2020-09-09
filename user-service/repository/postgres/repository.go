@@ -129,7 +129,8 @@ func (r *pgRepository) FindAll(page int, rowsPerPage int, sortBy string, descend
 	"full_name" AS "user_full_name",
 	"email" AS "user_email",
 	"password" AS "user_password",
-	"registration_code" AS "user_registration_code",
+    CASE WHEN registration_code IS NULL THEN '' ELSE registration_code END AS user_registration_code,
+    CASE WHEN reset_password_code IS NULL THEN '' ELSE reset_password_code END AS user_reset_password_code,
 	"status" AS "user_status"
 	FROM "user"
 	%v
