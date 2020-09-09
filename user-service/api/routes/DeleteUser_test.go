@@ -2,7 +2,6 @@ package routes
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/ewol123/ticketer-server/user-service/repository/postgres/seed"
 	"github.com/ewol123/ticketer-server/user-service/user"
 	"github.com/go-chi/chi"
@@ -11,18 +10,17 @@ import (
 	"testing"
 )
 
-
-
-func TestGetUserBadRequest(t *testing.T) {
+func TestDeleteUserBadRequest(t *testing.T) {
 	seed.Init("../../repository/postgres/seed/seed_test.sql")
-
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
 	h := NewHandler(service)
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(h.GetUser)
-	req, err := http.NewRequest("GET", "/user/v1/asd", nil)
+	handler := http.HandlerFunc(h.DeleteUser)
+
+	req, err := http.NewRequest("DELETE", "/user/v1/", nil)
+	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		t.Errorf("GetUser test failed, error: %v", err)
 	}
@@ -37,23 +35,22 @@ func TestGetUserBadRequest(t *testing.T) {
 	}
 }
 
-func TestGetUserNotFound(t *testing.T){
+func TestDeleteUserNotFound(t *testing.T){
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
 	h := NewHandler(service)
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(h.GetUser)
-	req, err := http.NewRequest("GET", "/user/v1/", nil)
+	handler := http.HandlerFunc(h.DeleteUser)
+	req, err := http.NewRequest("DELETE", "/user/v1/", nil)
 	if err != nil {
 		t.Errorf("GetUser test failed, error: %v", err)
 	}
 
 	ctx := chi.NewRouteContext()
-	ctx.URLParams.Add("id", "c655b6b9-3956-4ee9-910a-2560e8e49d6e")
+	ctx.URLParams.Add("id", "1dbbaa7b-0861-49c2-abde-c31722787166")
 
 	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, ctx))
-
 	handler.ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusNotFound {
@@ -64,21 +61,22 @@ func TestGetUserNotFound(t *testing.T){
 	}
 }
 
-func TestGetUserFound(t *testing.T){
+func TestDeleteUser(t *testing.T){
 
 	repo := ChooseRepo()
 	service := user.NewUserService(repo)
 	h := NewHandler(service)
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(h.GetUser)
-	req, err := http.NewRequest("GET", "/user/v1/", nil)
+	handler := http.HandlerFunc(h.DeleteUser)
+	req, err := http.NewRequest("DELETE", "/user/v1/", nil)
 	if err != nil {
 		t.Errorf("GetUser test failed, error: %v", err)
 	}
 
 	ctx := chi.NewRouteContext()
-	ctx.URLParams.Add("id", "e66c0b06-ec6c-45e1-8619-27e14c3ed92d")
+	ctx.URLParams.Add("id", "d076f530-2453-4af2-a9a2-52b54dc3d36f")
+
 	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, ctx))
 	handler.ServeHTTP(rr, req)
 
@@ -88,20 +86,6 @@ func TestGetUserFound(t *testing.T){
 			status, http.StatusOK)
 	} else {
 		t.Logf("handler returned correct status code: got %v want %v", status, http.StatusOK)
-	}
-
-	// check response body
-	m := make(map[string]interface{})
-	if err := json.Unmarshal(rr.Body.Bytes(), &m); err != nil {
-		t.Errorf("cannot decode response body of GetUser %v", err)
-	}
-
-	isEqual := m["Email"] == "peti@test.com" && m["FullName"] == "peti" && m["RegistrationCode"] == ""
-
-	if isEqual != true {
-		t.Errorf("handler returned wrong response body")
-	} else {
-		t.Logf("handler returned correct response body")
 	}
 	seed.TearDown()
 }
