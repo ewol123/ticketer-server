@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 )
 
 func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
@@ -57,6 +58,7 @@ func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
 		claims[role.Name] = true
 	}
 
+	jwtauth.SetExpiry(claims, time.Now().Add(time.Hour * 24))
 	_, tokenString, err := tokenAuth.Encode(claims)
 
 	if err != nil {
