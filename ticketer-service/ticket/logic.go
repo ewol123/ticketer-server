@@ -29,7 +29,10 @@ func (t ticketService) SyncTicketWorker(model *SyncTicketRequestModelWorker) (*S
 	lat := model.Lat
 	long := model.Long
 
-	// ticket validation and update
+
+// TICKET VALIDATION AND UPDATE
+// ///////////////////////////
+
 	for _, ticket := range model.Rows {
 		checkTicket, err := t.ticketRepo.Find("id",ticket.Id)
 
@@ -60,7 +63,9 @@ func (t ticketService) SyncTicketWorker(model *SyncTicketRequestModelWorker) (*S
 		}
 	}
 
-	// now we get the fresh state
+// GET THE FRESH STATE
+// ///////////////////////////
+
 	// pagination with 10 results / page.
 	// since a worker won't have more than 10 tickets at a time it's enough
 	page := 1
@@ -80,8 +85,6 @@ func (t ticketService) SyncTicketWorker(model *SyncTicketRequestModelWorker) (*S
 
 	var syncTicketResponseModels SyncTicketResponseModelWorker
 
-
-
 		if len(*tickets) > 0 {
 			for _, ticket := range *tickets {
 				gTicketModel := SyncTicketResp{
@@ -98,7 +101,8 @@ func (t ticketService) SyncTicketWorker(model *SyncTicketRequestModelWorker) (*S
 			}
 		}
 
-	// before returning the fresh state we need to assign new tickets if needed
+// ASSIGN NEW TICKETS IF NEEDED
+// ///////////////////////////
 
 	if len(syncTicketResponseModels.Rows) < 10 { // TODO: change this if more than 10 tickets need to be assigned at the same time
 
