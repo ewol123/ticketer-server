@@ -132,6 +132,19 @@ func (t ticketService) SyncTicketWorker(model *SyncTicketRequestModelWorker) (*S
 					ServerUpdatedAt: newTicket.UpdatedAt,
 				}
 				syncTicketResponseModels.Rows = append(syncTicketResponseModels.Rows,gTicketModel)
+
+				// assign new ticket to the worker in the database too
+				// usually we should only have one WRITE operation so everything is atomic
+				// but because of the way the app is designed it won't cause any inconsistency
+				updateForm := Ticket{
+					Id: newTicket.Id,
+					WorkerId: workerId,
+				}
+				err = t.ticketRepo.Update(&updateForm)
+				if err != nil {
+					return nil, errs.Wrap(err, "service.Ticket.SyncTicketWorker")
+				}
+
 			}
 		}
 	}
