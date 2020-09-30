@@ -105,7 +105,7 @@ func (r *pgRepository) FindAll(page int, rowsPerPage int, sortBy string, descend
 	}
 
 	if filter != "" {
-		whereQuery = fmt.Sprintf(`WHERE ("ticket"."full_name" ILIKE '%`+filter+`%') OR ("ticket"."address" ILIKE '%`+filter+`%') OR ("ticket"."phone" ILIKE '%`+filter+`%')`)
+		whereQuery = fmt.Sprintf(`WHERE "ticket"."full_name" ILIKE '%%%v%%' OR "ticket"."address" ILIKE '%%%v%%' OR "ticket"."phone" ILIKE '%%%v%%'`, filter,filter,filter)
 	} else {
 		whereQuery = `WHERE true`
 	}
