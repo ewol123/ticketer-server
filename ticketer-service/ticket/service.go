@@ -23,6 +23,7 @@ type Service interface {
 
 // CREATE TICKET MODELS
 // ///////////////////////////
+
 type CreateTicketRequestModelUser struct {
 	UserId string `validate:"empty=false & format=uuid4"`
 	FaultType FaultType `validate:"empty=false"`
@@ -36,6 +37,7 @@ type CreateTicketRequestModelUser struct {
 
 // GET TICKET MODELS
 // ///////////////////////////
+
 type GetTicketRequestModelAdmin struct {
 	Id string `validate:"empty=false & format=uuid4"`
 }
@@ -60,6 +62,7 @@ type GetTicketResponseModel struct {
 
 // GET ALL TICKET MODELS
 // ///////////////////////////
+
 type GetAllTicketRequestModelAdmin struct {
 	Page int `validate:"gte=0"`
 	RowsPerPage int `validate:"gte=0"`
@@ -70,6 +73,7 @@ type GetAllTicketRequestModelAdmin struct {
 
 /* one worker probably will never have so many tickets at once that we need a pagination for them but
 we can never know so just implement it */
+
 type GetAllTicketRequestModelWorker struct {
 	Page int `validate:"gte=0"`
 	RowsPerPage int `validate:"gte=0"`
@@ -87,6 +91,7 @@ type GetAllTicketResponseModel struct {
 
 // UPDATE TICKET MODELS
 // ///////////////////////////
+
 type UpdateTicketRequestModelAdmin struct {
 	Id        string    `validate:"empty=false & format=uuid4"`
 	WorkerId string
@@ -103,12 +108,14 @@ type UpdateTicketRequestModelAdmin struct {
 
 // DELETE TICKET MODELS
 // ///////////////////////////
+
 type DeleteTicketRequestModelAdmin struct {
 	Id string `validate:"empty=false & format=uuid4"`
 }
 
 
 // SYNC TICKET MODELS
+
 type SyncTicket struct {
 	Id        string    `validate:"empty=false & format=uuid4"`
 	ImageUrl string `validate:"empty=false"`
