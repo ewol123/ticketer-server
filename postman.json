@@ -1,0 +1,623 @@
+{
+	"info": {
+		"name": "ticketer-server",
+		"_postman_id": "25f67264-12b4-a234-893e-a44b24cad94d",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8000/user/v1/healthcheck",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMjN9.PZLMJBT9OIVG2qgp9hQr685oVYFgRgWpcSPmNcw6y7M"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8000/user/v1/healthcheck",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"user",
+						"v1",
+						"healthcheck"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/user/v1/register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Email\":\"vbvbf1@gmail.com\",\n\t\"Password\":\"test\",\n\t\"FullName\":\"Peti vagyok\"\n\t\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:8000/user/v1/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"user",
+						"v1",
+						"register"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/user/v1/confirm-registration",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Email\": \"vbvbf1@gmail.com\",\n\t\"RegistrationCode\": \"688452\"\n\t\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/user/v1/confirm-registration",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"user",
+						"v1",
+						"confirm-registration"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/user/v1/login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Email\": \"vbvbf1@gmail.com\",\n\t\"Password\": \"test\"\n\t\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/user/v1/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"user",
+						"v1",
+						"login"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/user/v1/?page=1&rowsPerPage=10&descending=true&sortBy=user_id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTk5NzYyNTQyLCJ1c2VyIjp0cnVlfQ.HbHOUa7g4NWHff12VDTbYc5dyL_98hk2u9mYE5-CgJw"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8000/user/v1/?page=1&rowsPerPage=10&descending=true&sortBy=user_id",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"user",
+						"v1",
+						""
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1",
+							"equals": true
+						},
+						{
+							"key": "rowsPerPage",
+							"value": "10",
+							"equals": true
+						},
+						{
+							"key": "descending",
+							"value": "true",
+							"equals": true
+						},
+						{
+							"key": "sortBy",
+							"value": "user_id",
+							"equals": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/user/v1/send-passwd-reset",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Email\":\"vbvbf1@gmail\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/user/v1/send-passwd-reset",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"user",
+						"v1",
+						"send-passwd-reset"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/user/v1/reset-password",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Email\":\"vbvbf1@gmail.com\",\n\t\"ResetPasswordCode\": \"610000\",\n\t\"Password\": \"asdasd123\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/user/v1/reset-password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"user",
+						"v1",
+						"reset-password"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/user/v1/d2cf66fb-e0e8-4da3-a97d-9d92452b93f9",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwidXNlciI6dHJ1ZX0.JZLuWtsuPExbWMSuYMCQFyrSod_kT4d4QKU5J4Ms9FU"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"FullName\": \"peti vagyok az bizony\",\n\"Email\": \"gypeti23@gmail.com\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/user/v1/d2cf66fb-e0e8-4da3-a97d-9d92452b93f9",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"user",
+						"v1",
+						"d2cf66fb-e0e8-4da3-a97d-9d92452b93f9"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8000/user/v1/d2cf66fb-e0e8-4da3-a97d-9d92452b93f9",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwidXNlciI6dHJ1ZX0.JZLuWtsuPExbWMSuYMCQFyrSod_kT4d4QKU5J4Ms9FU"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8000/user/v1/d2cf66fb-e0e8-4da3-a97d-9d92452b93f9",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"user",
+						"v1",
+						"d2cf66fb-e0e8-4da3-a97d-9d92452b93f9"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8001/public/v1/healthcheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8001/public/v1/healthcheck",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"public",
+						"v1",
+						"healthcheck"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8001/user/v1/ticket",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n\t\"UserId\":\"20f87cee-985a-4163-8310-fb533ad8c202\",\n    \"FaultType\":\"leak\", \n    \"Address\":\"some address\",\n    \"FullName\":\"Peter\",\n    \"Phone\":\"36308999898\",    \n    \"Lat\":\"10.1\",\n    \"Long\":\"-10.1\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8001/user/v1/ticket",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"user",
+						"v1",
+						"ticket"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8001/admin/v1/ticket/221fc83e-3d71-4aba-a141-05abda456d9b",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8001/admin/v1/ticket/221fc83e-3d71-4aba-a141-05abda456d9b",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"admin",
+						"v1",
+						"ticket",
+						"221fc83e-3d71-4aba-a141-05abda456d9b"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8001/admin/v1/ticket?page=1&rowsPerPage=10&sortBy=ticket_id&descending=false&filter=peter",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": ""
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8001/admin/v1/ticket?page=1&rowsPerPage=10&sortBy=ticket_id&descending=false&filter=peter",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"admin",
+						"v1",
+						"ticket"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1",
+							"equals": true
+						},
+						{
+							"key": "rowsPerPage",
+							"value": "10",
+							"equals": true
+						},
+						{
+							"key": "sortBy",
+							"value": "ticket_id",
+							"equals": true
+						},
+						{
+							"key": "descending",
+							"value": "false",
+							"equals": true
+						},
+						{
+							"key": "filter",
+							"value": "peter",
+							"equals": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8001/worker/v1/ticket?page=1&rowsPerPage=10&sortBy=ticket_id&descending=false&filter=peter",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Requester-Id",
+						"value": "db0680dc-a497-4d34-b828-ad4841649fbe"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8001/worker/v1/ticket?page=1&rowsPerPage=10&sortBy=ticket_id&descending=false&filter=peter",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"worker",
+						"v1",
+						"ticket"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1",
+							"equals": true
+						},
+						{
+							"key": "rowsPerPage",
+							"value": "10",
+							"equals": true
+						},
+						{
+							"key": "sortBy",
+							"value": "ticket_id",
+							"equals": true
+						},
+						{
+							"key": "descending",
+							"value": "false",
+							"equals": true
+						},
+						{
+							"key": "filter",
+							"value": "peter",
+							"equals": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8001/admin/v1/ticket/c3dfa532-1188-4805-bb35-3a0d71be88eb",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8001/admin/v1/ticket/c3dfa532-1188-4805-bb35-3a0d71be88eb",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"admin",
+						"v1",
+						"ticket",
+						"c3dfa532-1188-4805-bb35-3a0d71be88eb"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8001/worker/v1/ticket/c3dfa532-1188-4805-bb35-3a0d71be88eb",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Requester-Id",
+						"value": "db0680dc-a497-4d34-b828-ad4841649fbe"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8001/worker/v1/ticket/c3dfa532-1188-4805-bb35-3a0d71be88eb",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"worker",
+						"v1",
+						"ticket",
+						"c3dfa532-1188-4805-bb35-3a0d71be88eb"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8001/admin/v1/ticket/c3dfa532-1188-4805-bb35-3a0d71be88eb",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Address\":\"address 2\",   \n    \"FullName\":\"peter 2\",  \n    \"Phone\":\"nophone\",     \n    \"Lat\":\"1.0\",       \n    \"Long\":\"2.0\",      \n    \"ImageUrl\":\"nincs\",  \n    \"Status\":\"done\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8001/admin/v1/ticket/c3dfa532-1188-4805-bb35-3a0d71be88eb",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"admin",
+						"v1",
+						"ticket",
+						"c3dfa532-1188-4805-bb35-3a0d71be88eb"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8001/worker/v1/ticket/sync",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Requester-Id",
+						"value": "db0680dc-a497-4d34-b828-ad4841649fbe"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n    \"Lat\": \"10.1\",\n    \"Long\": \"-10.1\",\n    \"Rows\":[\n    \t{\n\t\t    \"Id\":\"aa51a05a-673d-4ab5-9a4d-3d4580e3ff3c\",       \n\t\t    \"ImageUrl\": \"valami.com/jpgimage.jpg\",\n\t\t    \"Status\": \"done\"\n    \t}\n    \t]      \n\t\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8001/worker/v1/ticket/sync",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"worker",
+						"v1",
+						"ticket",
+						"sync"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
