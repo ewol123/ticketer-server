@@ -2,6 +2,12 @@ package routes
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/ewol123/ticketer-server/user-service/api/middlewares"
 	"github.com/ewol123/ticketer-server/user-service/repository/postgres"
 	js "github.com/ewol123/ticketer-server/user-service/serializer/json"
@@ -9,11 +15,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/jwtauth"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 // UserHandler : UserHandler interface
@@ -30,11 +31,9 @@ type UserHandler interface {
 	Healthcheck(http.ResponseWriter, *http.Request)
 }
 
-
 type handler struct {
 	userService user.Service
 }
-
 
 func setupResponse(w http.ResponseWriter, contentType string, body []byte, statusCode int) {
 	w.Header().Set("Content-Type", contentType)
@@ -45,7 +44,6 @@ func setupResponse(w http.ResponseWriter, contentType string, body []byte, statu
 	}
 }
 
-
 func (h *handler) serializer(contentType string) user.Serializer {
 	/*if contentType = "application/x-msgpack" {
 		return &ms.User{}
@@ -53,12 +51,10 @@ func (h *handler) serializer(contentType string) user.Serializer {
 	return &js.User{}
 }
 
-
 // NewHandler : returns a new UserHandler
 func NewHandler(userService user.Service) UserHandler {
 	return &handler{userService: userService}
 }
-
 
 // Run: runs the server
 func Run() UserHandler {
@@ -76,48 +72,46 @@ func Run() UserHandler {
 	r.Use(middleware.Recoverer)
 
 	//Protected routes (USER)
-	r.Group(func(r chi.Router){
+	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(middlewares.UserAuthenticator)
 
-
 		//VERIFY ROUTE USED BY THE INGRESS CONTROLLER
-		r.Get(AppVersion+ "/verify-user", func (w http.ResponseWriter, r *http.Request) {
+		r.Get(AppVersion+"/verify-user", func(w http.ResponseWriter, r *http.Request) {
 			contentType := r.Header.Get("Content-Type")
 			setupResponse(w, contentType, []byte{}, http.StatusOK)
 		})
 	})
 
 	//Protected routes (ADMIN)
-	r.Group(func(r chi.Router){
+	r.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(middlewares.AdminAuthenticator)
-		r.Get(AppVersion+ "/", handler.GetAllUser)
-		r.Get(AppVersion+ "/{id}", handler.GetUser)
-		r.Patch(AppVersion+ "/{id}", handler.UpdateUser)
-		r.Delete(AppVersion+ "/{id}", handler.DeleteUser)
-
+		r.Get(AppVersion+"/", handler.GetAllUser)
+		r.Get(AppVersion+"/{id}", handler.GetUser)
+		r.Patch(AppVersion+"/{id}", handler.UpdateUser)
+		r.Delete(AppVersion+"/{id}", handler.DeleteUser)
 
 		//VERIFY ROUTE USED BY THE INGRESS CONTROLLER
-		r.Get(AppVersion+ "/verify-admin", func (w http.ResponseWriter, r *http.Request) {
+		r.Get(AppVersion+"/verify-admin", func(w http.ResponseWriter, r *http.Request) {
 			contentType := r.Header.Get("Content-Type")
 			setupResponse(w, contentType, []byte{}, http.StatusOK)
 		})
 	})
 
 	// Public routes
-	r.Group(func(r chi.Router){
-		r.Get(AppVersion + "/healthcheck", handler.Healthcheck)
-		r.Post(AppVersion+ "/register", handler.Register)
-		r.Post(AppVersion+ "/confirm-registration", handler.ConfirmRegistration)
-		r.Post(AppVersion+ "/login", handler.Login)
-		r.Post(AppVersion+ "/send-passwd-reset", handler.SendPasswdReset)
-		r.Post(AppVersion+ "/reset-password", handler.ResetPassword)
+	r.Group(func(r chi.Router) {
+		r.Get(AppVersion+"/healthcheck", handler.Healthcheck)
+		r.Post(AppVersion+"/register", handler.Register)
+		r.Post(AppVersion+"/confirm-registration", handler.ConfirmRegistration)
+		r.Post(AppVersion+"/login", handler.Login)
+		r.Post(AppVersion+"/send-passwd-reset", handler.SendPasswdReset)
+		r.Post(AppVersion+"/reset-password", handler.ResetPassword)
 	})
 
 	errs := make(chan error, 2)
 	go func() {
-		fmt.Println("Listening on port :8000")
+		fmt.Println("Listening on port:" + httpPort())
 		errs <- http.ListenAndServe(httpPort(), r)
 
 	}()

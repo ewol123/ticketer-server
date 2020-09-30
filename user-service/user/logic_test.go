@@ -1,58 +1,58 @@
 package user
 
 import (
-	"github.com/pkg/errors"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/pkg/errors"
 )
 
-var roles  = []Role{
-	{ Id: "72daf87a-fda4-4c72-aff9-85edd68d155f", Name: "user" },
-	{ Id: "336a3ff6-9fdb-496f-ac8c-e37759969cf2", Name: "admin" },
+var roles = []Role{
+	{Id: "72daf87a-fda4-4c72-aff9-85edd68d155f", Name: "user"},
+	{Id: "336a3ff6-9fdb-496f-ac8c-e37759969cf2", Name: "admin"},
 }
 
 var user = User{
-	Id:        "8a5e9658-f954-45c0-a232-4dcbca0d4907",
-	FullName:  "Test User",
-	Email:     "test.user@test.com",
-	Password:  "$2y$10$2wcRIg0zbCk8b02HVgb3bui6Dkd8xeCZEmBhAbY8yfJ8NtzbzABk2",
-	RegistrationCode: "212345",
+	Id:                "8a5e9658-f954-45c0-a232-4dcbca0d4907",
+	FullName:          "Test User",
+	Email:             "test.user@test.com",
+	Password:          "$2y$10$2wcRIg0zbCk8b02HVgb3bui6Dkd8xeCZEmBhAbY8yfJ8NtzbzABk2",
+	RegistrationCode:  "212345",
 	ResetPasswordCode: "123456",
-	Status: ACTIVE,
-	Roles: roles,
+	Status:            ACTIVE,
+	Roles:             roles,
 }
 
 var user2 = User{
-	Id:        "2a5e9658-f954-45c0-a232-4dcbca0d4904",
-	FullName:  "Test User",
-	Email:     "test.user2@test.com",
-	Password:  "bcrypt",
-	RegistrationCode: "111111",
+	Id:                "2a5e9658-f954-45c0-a232-4dcbca0d4904",
+	FullName:          "Test User",
+	Email:             "test.user2@test.com",
+	Password:          "bcrypt",
+	RegistrationCode:  "111111",
 	ResetPasswordCode: "333333",
-	Status: ACTIVE,
+	Status:            ACTIVE,
 }
 
 var user3 = User{
-	Id:        "2a5e9658-d954-45c0-a232-4dcbca0d4904",
-	FullName:  "Test User",
-	Email:     "test.user3@test.com",
-	Password:  "something",
-	RegistrationCode: "111111",
+	Id:                "2a5e9658-d954-45c0-a232-4dcbca0d4904",
+	FullName:          "Test User",
+	Email:             "test.user3@test.com",
+	Password:          "something",
+	RegistrationCode:  "111111",
 	ResetPasswordCode: "333333",
-	Status: ACTIVE,
+	Status:            ACTIVE,
 }
 
-var user4 = User {
-	Id:        "2a5e9658-d954-45c0-a232-2dcbca0d4904",
-	FullName:  "Test User",
-	Email:     "test.user@resetpw.com",
-	Password:  "something",
-	RegistrationCode: "111111",
+var user4 = User{
+	Id:                "2a5e9658-d954-45c0-a232-2dcbca0d4904",
+	FullName:          "Test User",
+	Email:             "test.user@resetpw.com",
+	Password:          "something",
+	RegistrationCode:  "111111",
 	ResetPasswordCode: "333333",
-	Status: ACTIVE,
+	Status:            ACTIVE,
 }
-
 
 var users = []User{
 	user,
@@ -61,10 +61,9 @@ var users = []User{
 	user4,
 }
 
+type newRepo struct{}
 
-type newRepo struct {}
-
-func (r* newRepo) Find(column string, value string) (*User, error) {
+func (r *newRepo) Find(column string, value string) (*User, error) {
 
 	//hack for tests
 	firstUpper := strings.Title(column)
@@ -80,19 +79,19 @@ func (r* newRepo) Find(column string, value string) (*User, error) {
 	return nil, ErrUserNotFound
 }
 
-func (r* newRepo) FindAll(page int, rowsPerPage int, sortBy string, descending bool, filter string) (*[]User, int, error){
+func (r *newRepo) FindAll(page int, rowsPerPage int, sortBy string, descending bool, filter string) (*[]User, int, error) {
 	offsetPage := page - 1
 
-	if rowsPerPage * page > len(users) -1 {
+	if rowsPerPage*page > len(users)-1 {
 		return &users, len(users), nil
 	}
 
-	pagination := users[offsetPage * rowsPerPage: page * rowsPerPage]
+	pagination := users[offsetPage*rowsPerPage : page*rowsPerPage]
 	return &pagination, len(users), nil
 
 }
 
-func (r* newRepo) Update(user *User) error {
+func (r *newRepo) Update(user *User) error {
 	for i := range users {
 		if users[i].Id == user.Id {
 			users[i] = *user
@@ -102,7 +101,7 @@ func (r* newRepo) Update(user *User) error {
 	return ErrUserNotFound
 }
 
-func (r* newRepo) Delete(id string) error{
+func (r *newRepo) Delete(id string) error {
 	for i := range users {
 		if users[i].Id == id {
 			users[i] = users[len(users)-1]
@@ -114,11 +113,10 @@ func (r* newRepo) Delete(id string) error{
 	return ErrUserNotFound
 }
 
-func (r* newRepo) Store(user *User) (*User, error) {
+func (r *newRepo) Store(user *User) (*User, error) {
 	users = append(users, *user)
 	return user, nil
 }
-
 
 func TestRepository(t *testing.T) {
 
@@ -148,11 +146,11 @@ func TestNewUserService(t *testing.T) {
 	}
 }
 
-func TestGetUser(t *testing.T){
+func TestGetUser(t *testing.T) {
 	r := &newRepo{}
 	service := NewUserService(r)
 
-	getUserModel := GetUserRequestModel{Id: "8a5e9658-f954-45c0-a232-4dcbca0d4907" }
+	getUserModel := GetUserRequestModel{Id: "8a5e9658-f954-45c0-a232-4dcbca0d4907"}
 
 	shouldFind, err := service.GetUser(&getUserModel)
 
@@ -166,7 +164,7 @@ func TestGetUser(t *testing.T){
 		t.Logf("test found success, expected %v, got %v", user, shouldFind)
 	}
 
-	wrongModel := GetUserRequestModel{Id: "abc" }
+	wrongModel := GetUserRequestModel{Id: "abc"}
 
 	_, err = service.GetUser(&wrongModel)
 
@@ -184,18 +182,18 @@ func TestRegister(t *testing.T) {
 	service := NewUserService(r)
 
 	newUser := RegisterRequestModel{
-		FullName:  "test 2",
-		Email:     "test2@test.com",
-		Password:  "bcrypt2",
+		FullName: "test 2",
+		Email:    "test2@test.com",
+		Password: "bcrypt2",
 	}
 
 	invalidUser := RegisterRequestModel{
 		FullName: "hallo",
 	}
-	
+
 	user, err := service.Register(&newUser)
 
-	if err != nil{
+	if err != nil {
 		t.Errorf("test user register failed, expected %v, got %v", nil, err)
 	} else {
 		t.Logf("test user register success, expected %v, got %v", user, user)
@@ -203,20 +201,19 @@ func TestRegister(t *testing.T) {
 
 	user, err = service.Register(&invalidUser)
 
-	if err != nil{
+	if err != nil {
 		t.Logf("test user register invalid success, expected %v, got %v", ErrRequestInvalid, err)
 	} else {
 		t.Errorf("test user register invalid failed, expected %v, got %v", ErrRequestInvalid, err)
 	}
 }
 
-
 func TestConfirmRegistration(t *testing.T) {
 	r := &newRepo{}
 	service := NewUserService(r)
 
 	validUser := ConfirmRegistrationRequestModel{
-		Email:     "test.user2@test.com",
+		Email:            "test.user2@test.com",
 		RegistrationCode: "111111",
 	}
 
@@ -224,25 +221,24 @@ func TestConfirmRegistration(t *testing.T) {
 		Email: "hallo",
 	}
 
-	 err := service.ConfirmRegistration(&validUser)
+	err := service.ConfirmRegistration(&validUser)
 
-	if err != nil{
+	if err != nil {
 		t.Errorf("test user confirm registration failed, expected %v, got %v", nil, err)
 	} else {
 		t.Logf("test user confirm registration success, expected %v, got %v", nil, nil)
 	}
 
-	 err = service.ConfirmRegistration(&invalidUser)
+	err = service.ConfirmRegistration(&invalidUser)
 
-	if err != nil{
+	if err != nil {
 		t.Logf("test user confirm registration invalid success, expected %v, got %v", ErrRequestInvalid, err)
 	} else {
 		t.Errorf("test user confirm registration invalid failed, expected %v, got %v", ErrRequestInvalid, err)
 	}
 }
 
-
-func TestGetAllUser(t *testing.T){
+func TestGetAllUser(t *testing.T) {
 	r := &newRepo{}
 	service := NewUserService(r)
 
@@ -263,7 +259,7 @@ func TestGetAllUser(t *testing.T){
 	if shouldFind.Rows[0].Id != "8a5e9658-f954-45c0-a232-4dcbca0d4907" {
 		t.Errorf("test GetAllUser failed, expected %v, got %v", "8a5e9658-f954-45c0-a232-4dcbca0d4907", shouldFind.Rows[0].Id)
 	} else {
-		t.Logf("test GetAllUser success, expected %v, got %v", "8a5e9658-f954-45c0-a232-4dcbca0d4907",  shouldFind.Rows[0].Id)
+		t.Logf("test GetAllUser success, expected %v, got %v", "8a5e9658-f954-45c0-a232-4dcbca0d4907", shouldFind.Rows[0].Id)
 	}
 
 	if shouldFind.Count > 0 {
@@ -271,7 +267,6 @@ func TestGetAllUser(t *testing.T){
 	} else {
 		t.Errorf("test GetAllUser failed, expected %v, got %v", "greater than zero", shouldFind.Count)
 	}
-
 
 	wrongModel := GetAllUserRequestModel{
 		RowsPerPage: 0,
@@ -291,7 +286,7 @@ func TestGetAllUser(t *testing.T){
 	}
 }
 
-func TestLogin(t *testing.T){
+func TestLogin(t *testing.T) {
 	r := &newRepo{}
 	service := NewUserService(r)
 
@@ -309,20 +304,20 @@ func TestLogin(t *testing.T){
 	}
 
 	if loginResp.Roles[0].Name != "user" {
-		t.Errorf("test login failed, expected role %v, got %v","user", loginResp.Roles[0].Name)
+		t.Errorf("test login failed, expected role %v, got %v", "user", loginResp.Roles[0].Name)
 	} else {
 		t.Logf("test Login success, expected role %v, got %v", "user", loginResp.Roles[0].Name)
 	}
 
 	badLoginModel := LoginRequestModel{
-		Email:    "asdsad",
+		Email: "asdsad",
 	}
 
 	loginResp, err = service.Login(&badLoginModel)
 
 	if err != nil {
 		if errors.Cause(err) == ErrRequestInvalid {
-			t.Logf("test Login success, expected %v, got %v",ErrRequestInvalid, err)
+			t.Logf("test Login success, expected %v, got %v", ErrRequestInvalid, err)
 		} else {
 			t.Errorf("test Login failed, expected %v, got %v", ErrRequestInvalid, err)
 		}
@@ -337,19 +332,19 @@ func TestLogin(t *testing.T){
 
 	if err != nil {
 		if errors.Cause(err) == ErrUserInvalid {
-			t.Logf("test Login success, expected %v, got %v",ErrUserInvalid, err)
+			t.Logf("test Login success, expected %v, got %v", ErrUserInvalid, err)
 		} else {
 			t.Errorf("test Login failed, expected %v, got %v", ErrUserInvalid, err)
 		}
 	}
 }
 
-func TestSendPasswdReset(t *testing.T){
+func TestSendPasswdReset(t *testing.T) {
 	r := &newRepo{}
 	service := NewUserService(r)
 
 	newUser := SendPasswdResetRequestModel{
-		Email:     "test.user3@test.com",
+		Email: "test.user3@test.com",
 	}
 
 	invalidUser := SendPasswdResetRequestModel{
@@ -358,7 +353,7 @@ func TestSendPasswdReset(t *testing.T){
 
 	user, err := service.SendPasswdReset(&newUser)
 
-	if err != nil{
+	if err != nil {
 		t.Errorf("test user SendPasswdReset failed, expected %v, got %v", nil, err)
 	} else {
 		t.Logf("test user SendPasswdReset success, expected %v, got %v", "SendPasswdResetResponseModel", user)
@@ -366,7 +361,7 @@ func TestSendPasswdReset(t *testing.T){
 
 	user, err = service.SendPasswdReset(&invalidUser)
 
-	if err != nil{
+	if err != nil {
 		t.Logf("test user SendPasswdReset invalid success, expected %v, got %v", ErrRequestInvalid, err)
 	} else {
 		t.Errorf("test user SendPasswdReset invalid failed, expected %v, got %v", ErrRequestInvalid, err)
@@ -374,14 +369,14 @@ func TestSendPasswdReset(t *testing.T){
 
 }
 
-func TestResetPassword(t *testing.T){
+func TestResetPassword(t *testing.T) {
 	r := &newRepo{}
 	service := NewUserService(r)
 
 	validUser := ResetPasswordRequestModel{
-		Email:     "test.user@resetpw.com",
+		Email:             "test.user@resetpw.com",
 		ResetPasswordCode: "333333",
-		Password: "asdasd1234",
+		Password:          "asdasd1234",
 	}
 
 	invalidUser := ResetPasswordRequestModel{
@@ -390,7 +385,7 @@ func TestResetPassword(t *testing.T){
 
 	err := service.ResetPassword(&validUser)
 
-	if err != nil{
+	if err != nil {
 		t.Errorf("test user ResetPassword failed, expected %v, got %v", nil, err)
 	} else {
 		t.Logf("test user ResetPassword success, expected %v, got %v", nil, nil)
@@ -398,7 +393,7 @@ func TestResetPassword(t *testing.T){
 
 	err = service.ResetPassword(&invalidUser)
 
-	if err != nil{
+	if err != nil {
 		t.Logf("test user ResetPassword invalid success, expected %v, got %v", ErrRequestInvalid, err)
 	} else {
 		t.Errorf("test user ResetPassword invalid failed, expected %v, got %v", ErrRequestInvalid, err)
@@ -410,11 +405,10 @@ func TestUpdateUser(t *testing.T) {
 	r := &newRepo{}
 	service := NewUserService(r)
 
-
 	updateUser := UpdateUserRequestModel{
-		Id: "8a5e9658-f954-45c0-a232-4dcbca0d4907",
-		FullName:  "updated",
-		Email:     "updated@test.com",
+		Id:       "8a5e9658-f954-45c0-a232-4dcbca0d4907",
+		FullName: "updated",
+		Email:    "updated@test.com",
 	}
 
 	invalidUser := UpdateUserRequestModel{
@@ -423,7 +417,7 @@ func TestUpdateUser(t *testing.T) {
 
 	err := service.UpdateUser(&updateUser)
 
-	if err != nil{
+	if err != nil {
 		t.Errorf("test user update failed, expected %v, got %v", nil, err)
 	} else {
 		t.Logf("test user update success, expected %v, got %v", nil, err)
@@ -436,31 +430,31 @@ func TestUpdateUser(t *testing.T) {
 	shouldFind, err := service.GetUser(&gUserReqModel)
 
 	if err != nil {
-		t.Errorf("test user update failed, expected %v after update, got %v",updateUser, shouldFind)
+		t.Errorf("test user update failed, expected %v after update, got %v", shouldFind, err)
 	} else {
 		if shouldFind.FullName != "updated" {
-			t.Errorf("test user update failed, expected FullName = %v after update, got %v",updateUser.FullName, shouldFind.FullName)
+			t.Errorf("test user update failed, expected FullName = %v after update, got %v", updateUser.FullName, shouldFind.FullName)
 		}
-		if shouldFind.Email != "updated@test.com"{
-			t.Errorf("test user update failed, expected Email = %v after update, got %v",updateUser.Email, shouldFind.Email)
+		if shouldFind.Email != "updated@test.com" {
+			t.Errorf("test user update failed, expected Email = %v after update, got %v", updateUser.Email, shouldFind.Email)
 		}
-			t.Logf("test user update success, all values are as expected")
+		t.Logf("test user update success, all values are as expected")
 	}
 
 	err = service.UpdateUser(&invalidUser)
 
-	if err != nil{
+	if err != nil {
 		t.Logf("test user update invalid success, expected %v, got %v", ErrUserInvalid, err)
 	} else {
 		t.Errorf("test user update invalid failed, expected %v, got %v", ErrUserInvalid, err)
 	}
 }
 
-func TestDeleteUser(t *testing.T){
+func TestDeleteUser(t *testing.T) {
 	r := &newRepo{}
 	service := NewUserService(r)
 
-	deleteUserModel := DeleteUserRequestModel{Id:"8a5e9658-f954-45c0-a232-4dcbca0d4907" }
+	deleteUserModel := DeleteUserRequestModel{Id: "8a5e9658-f954-45c0-a232-4dcbca0d4907"}
 
 	err := service.DeleteUser(&deleteUserModel)
 
@@ -470,8 +464,7 @@ func TestDeleteUser(t *testing.T){
 		t.Logf("test delete success, expected %v, got %v", nil, err)
 	}
 
-
-	invalidModel := DeleteUserRequestModel{Id:"abc" }
+	invalidModel := DeleteUserRequestModel{Id: "abc"}
 
 	err = service.DeleteUser(&invalidModel)
 
