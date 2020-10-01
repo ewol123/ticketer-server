@@ -1,1 +1,1 @@
-goose postgres "user=postgres password=test dbname=ticketer_test sslmode=disable" up
+goose postgres "user=postgres password=ticketer dbname=ticketer sslmode=disable" up
