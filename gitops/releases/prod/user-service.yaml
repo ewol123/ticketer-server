@@ -1,0 +1,35 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: user-service-prod
+  namespace: prod
+  labels:
+    chart: user-service
+  annotations:
+    flux.weave.works/automated: "true"
+    flux.weave.works/tag.chart-image: semver:~v0.0.1
+spec:
+  releaseName: user-service-prod
+  chart:
+    git: git@github.com:ewol123/ticketer-server
+    path: charts/user-service
+    ref: master
+  values:
+    image: 
+      repository: gyulavaripeter/user-service
+      tag: v0.0.1
+    replicaCount: 3
+    hpa:
+      enabled: true
+      maxReplicas: 10
+      cpu: 50
+    canary:
+        enabled: true
+        istioIngress:
+          enabled: true
+          gateway: public-gateway.istio-system.svc.cluster.local
+          host: service.qchat.ga
+        loadtest:
+          enabled: true
+        helmtest:
+          enabled: true
