@@ -1,12 +1,13 @@
 package routes
 
 import (
-	"github.com/ewol123/ticketer-server/ticketer-service/hack"
-	"github.com/ewol123/ticketer-server/ticketer-service/ticket"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/ewol123/ticketer-server/ticketer-service/hack"
+	"github.com/ewol123/ticketer-server/ticketer-service/ticket"
 )
 
 func TestCreateTicketUserBadRequest(t *testing.T) {
@@ -46,7 +47,7 @@ func TestCreateTicketUser(t *testing.T) {
 
 	req, err := http.NewRequest("POST", "/user/v1/ticket",
 		strings.NewReader(`
-		{"UserId":"34587a3b-d625-4782-a1de-04a9094f0475", 
+		{, 
 		"FaultType": "leak", 
 		"Address": "test", 
 		"FullName": "Peter", 

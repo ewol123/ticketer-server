@@ -1,16 +1,19 @@
 package routes
 
 import (
+	"io/ioutil"
+	"net/http"
+
 	"github.com/ewol123/ticketer-server/ticketer-service/serializer/mapdecoder"
 	"github.com/ewol123/ticketer-server/ticketer-service/ticket"
 	"github.com/pkg/errors"
-	"io/ioutil"
-	"net/http"
 )
 
 // CreateTicketUser : create a new ticket
 func (h *handler) CreateTicketUser(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("Content-Type")
+	requesterId := r.Header.Get("Requester-Id")
+
 	requestBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -23,13 +26,13 @@ func (h *handler) CreateTicketUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	model := &ticket.CreateTicketRequestModelUser{}
-	err = mapdecoder.Decode(*request,&model)
+	err = mapdecoder.Decode(*request, &model)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+	model["RequesterId"] = requesterId
 
 	err = h.ticketService.CreateTicketUser(model)
 	if err != nil {
