@@ -1,15 +1,16 @@
 package routes
 
 import (
+	"io/ioutil"
+	"net/http"
+	"os"
+	"time"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/ewol123/ticketer-server/user-service/serializer/mapdecoder"
 	"github.com/ewol123/ticketer-server/user-service/user"
 	"github.com/go-chi/jwtauth"
 	"github.com/pkg/errors"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"time"
 )
 
 func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
@@ -57,8 +58,9 @@ func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
 	for _, role := range loginRes.Roles {
 		claims[role.Name] = true
 	}
+	claims["userId"] = loginRes.Id
 
-	jwtauth.SetExpiry(claims, time.Now().Add(time.Hour * 24))
+	jwtauth.SetExpiry(claims, time.Now().Add(time.Hour*24))
 	_, tokenString, err := tokenAuth.Encode(claims)
 
 	if err != nil {

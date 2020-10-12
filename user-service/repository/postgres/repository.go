@@ -26,6 +26,7 @@ func newPgClient(connectionString string) (*sql.DB, error) {
 
 	_, err = db.Query(`SELECT * FROM "user" WHERE "id"=$1`, "69709b7e-b769-4587-ac0b-5bb99e122c27")
     if err != nil {
+    	db.Close()
 		return nil, err
     }
 

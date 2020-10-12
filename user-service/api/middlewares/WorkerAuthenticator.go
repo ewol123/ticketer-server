@@ -6,7 +6,7 @@ import (
 	"github.com/go-chi/jwtauth"
 )
 
-func UserAuthenticator(next http.Handler) http.Handler {
+func WorkerAuthenticator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, claims, err := jwtauth.FromContext(r.Context())
 
@@ -20,7 +20,7 @@ func UserAuthenticator(next http.Handler) http.Handler {
 			return
 		}
 
-		if claims["user"] != true {
+		if claims["worker"] != true {
 			http.Error(w, http.StatusText(401), 401)
 			return
 		}

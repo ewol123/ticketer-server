@@ -79,6 +79,20 @@ func Run() UserHandler {
 		//VERIFY ROUTE USED BY THE INGRESS CONTROLLER
 		r.Get(AppVersion+"/verify-user", func(w http.ResponseWriter, r *http.Request) {
 			contentType := r.Header.Get("Content-Type")
+
+			setupResponse(w, contentType, []byte{}, http.StatusOK)
+		})
+	})
+
+	//Protected routes (WORKER)
+	r.Group(func(r chi.Router) {
+		r.Use(jwtauth.Verifier(tokenAuth))
+		r.Use(middlewares.WorkerAuthenticator)
+
+		//VERIFY ROUTE USED BY THE INGRESS CONTROLLER
+		r.Get(AppVersion+"/verify-worker", func(w http.ResponseWriter, r *http.Request) {
+			contentType := r.Header.Get("Content-Type")
+
 			setupResponse(w, contentType, []byte{}, http.StatusOK)
 		})
 	})
@@ -95,6 +109,7 @@ func Run() UserHandler {
 		//VERIFY ROUTE USED BY THE INGRESS CONTROLLER
 		r.Get(AppVersion+"/verify-admin", func(w http.ResponseWriter, r *http.Request) {
 			contentType := r.Header.Get("Content-Type")
+
 			setupResponse(w, contentType, []byte{}, http.StatusOK)
 		})
 	})
@@ -146,7 +161,9 @@ func ChooseRepo() user.Repository {
 	}
 	re := repo */
 	case "postgres":
-		connectionString := os.Getenv("CONNECTION_STRING")
+		host := os.Getenv("PG_HOST")
+		connectionParams := os.Getenv("CONNECTION_STRING")
+		connectionString := fmt.Sprintf(`host=%v %v`, host, connectionParams)
 		pgRepo, err := postgres.NewPgRepository(connectionString)
 		if err != nil {
 			log.Fatal(err)

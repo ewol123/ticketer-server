@@ -3,27 +3,24 @@ package user
 import (
 	"crypto/rand"
 	"errors"
+	"time"
+
 	"github.com/google/uuid"
 	errs "github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 	validate "gopkg.in/dealancer/validate.v2"
-	"time"
 )
-
 
 // errors
 var (
-	ErrUserNotFound = errors.New("user Not Found")
-	ErrUserInvalid  = errors.New("user Invalid")
+	ErrUserNotFound   = errors.New("user Not Found")
+	ErrUserInvalid    = errors.New("user Invalid")
 	ErrRequestInvalid = errors.New("request payload is invalid")
 )
-
 
 type userService struct {
 	userRepo Repository
 }
-
-
 
 // NewUserService : create a new user service
 func NewUserService(userRepo Repository) Service {
@@ -32,33 +29,31 @@ func NewUserService(userRepo Repository) Service {
 	}
 }
 
-
 func (u *userService) GetUser(model *GetUserRequestModel) (*GetUserResponseModel, error) {
 	if err := validate.Validate(model); err != nil {
 		return nil, errs.Wrap(ErrRequestInvalid, "service.User.GetUser")
 	}
 
-	user, err := u.userRepo.Find("id",model.Id)
+	user, err := u.userRepo.Find("id", model.Id)
 	if err != nil {
 		return nil, errs.Wrap(err, "service.User.GetUser")
 	}
 
 	getUserResponseModel := GetUserResponseModel{
-		Id:        user.Id,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-		FullName:  user.FullName,
-		Email:     user.Email,
-		Status:    user.Status,
-		RegistrationCode: user.RegistrationCode,
+		Id:                user.Id,
+		CreatedAt:         user.CreatedAt,
+		UpdatedAt:         user.UpdatedAt,
+		FullName:          user.FullName,
+		Email:             user.Email,
+		Status:            user.Status,
+		RegistrationCode:  user.RegistrationCode,
 		ResetPasswordCode: user.ResetPasswordCode,
-		Roles:     user.Roles,
+		Roles:             user.Roles,
 	}
 
 	return &getUserResponseModel, nil
 
 }
-
 
 func (u *userService) GetAllUser(model *GetAllUserRequestModel) (*GetAllUserResponseModel, error) {
 	if err := validate.Validate(model); err != nil {
@@ -71,7 +66,7 @@ func (u *userService) GetAllUser(model *GetAllUserRequestModel) (*GetAllUserResp
 	descending := model.Descending
 	filter := model.Filter
 
-	users,count,err := u.userRepo.FindAll(page,rowsPerPage,sortBy,descending,filter)
+	users, count, err := u.userRepo.FindAll(page, rowsPerPage, sortBy, descending, filter)
 
 	if err != nil {
 		return nil, errs.Wrap(err, "service.User.GetAllUser")
@@ -80,9 +75,9 @@ func (u *userService) GetAllUser(model *GetAllUserRequestModel) (*GetAllUserResp
 	var getUserResponseModels []GetUserResponseModel
 
 	if len(*users) > 0 {
-		for _,user := range *users {
+		for _, user := range *users {
 			gUserModel := GetUserResponseModel{
-				Id:       user.Id,
+				Id:        user.Id,
 				CreatedAt: user.CreatedAt,
 				UpdatedAt: user.UpdatedAt,
 				FullName:  user.FullName,
@@ -90,7 +85,7 @@ func (u *userService) GetAllUser(model *GetAllUserRequestModel) (*GetAllUserResp
 				Status:    user.Status,
 				Roles:     user.Roles,
 			}
-			getUserResponseModels = append(getUserResponseModels,gUserModel)
+			getUserResponseModels = append(getUserResponseModels, gUserModel)
 		}
 	}
 
@@ -103,8 +98,7 @@ func (u *userService) GetAllUser(model *GetAllUserRequestModel) (*GetAllUserResp
 
 }
 
-
-func (u *userService) Register(model *RegisterRequestModel) (*RegisterReturnModel,error) {
+func (u *userService) Register(model *RegisterRequestModel) (*RegisterReturnModel, error) {
 	if err := validate.Validate(model); err != nil {
 		return nil, errs.Wrap(ErrRequestInvalid, "service.User.Register")
 	}
@@ -116,7 +110,7 @@ func (u *userService) Register(model *RegisterRequestModel) (*RegisterReturnMode
 
 	regCode, err := genCode(6)
 	if err != nil {
-		return  nil, errs.Wrap(err, "service.User.Register")
+		return nil, errs.Wrap(err, "service.User.Register")
 	}
 
 	password := []byte(model.Password)
@@ -126,15 +120,15 @@ func (u *userService) Register(model *RegisterRequestModel) (*RegisterReturnMode
 	}
 
 	user := User{
-		Id:                id.String(),
-		CreatedAt:         time.Now(),
-		UpdatedAt:         time.Now(),
-		FullName:          model.FullName,
-		Email:             model.Email,
-		Password:          string(hashedPassword),
-		Status:            PENDING,
-		RegistrationCode:  regCode,
-		Roles:             []Role{USER},
+		Id:               id.String(),
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
+		FullName:         model.FullName,
+		Email:            model.Email,
+		Password:         string(hashedPassword),
+		Status:           PENDING,
+		RegistrationCode: regCode,
+		Roles:            []Role{USER},
 	}
 
 	_, err = u.userRepo.Store(&user)
@@ -144,7 +138,7 @@ func (u *userService) Register(model *RegisterRequestModel) (*RegisterReturnMode
 	}
 
 	regReturnModel := RegisterReturnModel{
-		Id: id.String(),
+		Id:               id.String(),
 		RegistrationCode: regCode,
 	}
 
@@ -156,9 +150,9 @@ func (u *userService) ConfirmRegistration(model *ConfirmRegistrationRequestModel
 		return errs.Wrap(ErrRequestInvalid, "service.User.ConfirmRegistration")
 	}
 
-	user, err := u.userRepo.Find("email",model.Email)
+	user, err := u.userRepo.Find("email", model.Email)
 	if err != nil {
-		return  errs.Wrap(err, "service.User.ConfirmRegistration")
+		return errs.Wrap(err, "service.User.ConfirmRegistration")
 	}
 
 	if user.RegistrationCode != model.RegistrationCode {
@@ -166,9 +160,9 @@ func (u *userService) ConfirmRegistration(model *ConfirmRegistrationRequestModel
 	}
 
 	updateUser := User{
-		Id: user.Id,
-		UpdatedAt: time.Now(),
-		Status: ACTIVE,
+		Id:               user.Id,
+		UpdatedAt:        time.Now(),
+		Status:           ACTIVE,
 		RegistrationCode: "",
 	}
 
@@ -181,10 +175,10 @@ func (u *userService) Login(model *LoginRequestModel) (*LoginResponseModel, erro
 		return nil, errs.Wrap(ErrRequestInvalid, "service.User.Login")
 	}
 
-	user, err := u.userRepo.Find("email",model.Email)
+	user, err := u.userRepo.Find("email", model.Email)
 
 	if err != nil {
-		return  nil, errs.Wrap(ErrUserNotFound, "service.User.Login")
+		return nil, errs.Wrap(ErrUserNotFound, "service.User.Login")
 	}
 
 	if user.Status != ACTIVE {
@@ -196,18 +190,18 @@ func (u *userService) Login(model *LoginRequestModel) (*LoginResponseModel, erro
 		return nil, errs.Wrap(ErrUserInvalid, "service.User.Login")
 	}
 
-	respModel := LoginResponseModel{Roles: user.Roles}
+	respModel := LoginResponseModel{Roles: user.Roles, Id: user.Id}
 
 	return &respModel, nil
 
 }
 
-func (u *userService) SendPasswdReset(model *SendPasswdResetRequestModel) (*SendPasswdResetResponseModel,error) {
+func (u *userService) SendPasswdReset(model *SendPasswdResetRequestModel) (*SendPasswdResetResponseModel, error) {
 	if err := validate.Validate(model); err != nil {
-		return nil,errs.Wrap(ErrRequestInvalid, "service.User.SendPasswdReset")
+		return nil, errs.Wrap(ErrRequestInvalid, "service.User.SendPasswdReset")
 	}
 
-	user, err := u.userRepo.Find("email",model.Email)
+	user, err := u.userRepo.Find("email", model.Email)
 
 	if err != nil {
 		return nil, errs.Wrap(ErrUserNotFound, "service.User.SendPasswdReset")
@@ -219,11 +213,11 @@ func (u *userService) SendPasswdReset(model *SendPasswdResetRequestModel) (*Send
 
 	regCode, err := genCode(6)
 	if err != nil {
-		return  nil, errs.Wrap(err, "service.User.SendPasswdReset")
+		return nil, errs.Wrap(err, "service.User.SendPasswdReset")
 	}
 
 	updateUser := User{
-		Id: user.Id,
+		Id:                user.Id,
 		UpdatedAt:         time.Now(),
 		ResetPasswordCode: regCode,
 	}
@@ -236,21 +230,20 @@ func (u *userService) SendPasswdReset(model *SendPasswdResetRequestModel) (*Send
 
 	pwdResetResponseModel := SendPasswdResetResponseModel{
 		ResetPasswordCode: regCode,
-		Email: user.Email,
-		FullName: user.FullName}
+		Email:             user.Email,
+		FullName:          user.FullName}
 
 	return &pwdResetResponseModel, nil
 }
-
 
 func (u *userService) ResetPassword(model *ResetPasswordRequestModel) error {
 	if err := validate.Validate(model); err != nil {
 		return errs.Wrap(ErrRequestInvalid, "service.User.ResetPassword")
 	}
 
-	user, err := u.userRepo.Find("email",model.Email)
+	user, err := u.userRepo.Find("email", model.Email)
 	if err != nil {
-		return  errs.Wrap(err, "service.User.ResetPassword")
+		return errs.Wrap(err, "service.User.ResetPassword")
 	}
 
 	if user.ResetPasswordCode != model.ResetPasswordCode {
@@ -264,10 +257,10 @@ func (u *userService) ResetPassword(model *ResetPasswordRequestModel) error {
 	}
 
 	updateUser := User{
-		Id: user.Id,
-		UpdatedAt: time.Now(),
+		Id:                user.Id,
+		UpdatedAt:         time.Now(),
 		ResetPasswordCode: "",
-		Password: string(hashedPassword),
+		Password:          string(hashedPassword),
 	}
 
 	return u.userRepo.Update(&updateUser)
@@ -280,16 +273,15 @@ func (u *userService) UpdateUser(model *UpdateUserRequestModel) error {
 	}
 
 	user := User{
-		Id: 			  model.Id,
-		UpdatedAt:        time.Now(),
-		FullName:         model.FullName,
-		Email:            model.Email,
-		Status:           model.Status,
+		Id:        model.Id,
+		UpdatedAt: time.Now(),
+		FullName:  model.FullName,
+		Email:     model.Email,
+		Status:    model.Status,
 	}
 
 	return u.userRepo.Update(&user)
 }
-
 
 func (u *userService) DeleteUser(model *DeleteUserRequestModel) error {
 	if err := validate.Validate(model); err != nil {
@@ -298,9 +290,9 @@ func (u *userService) DeleteUser(model *DeleteUserRequestModel) error {
 	return u.userRepo.Delete(model.Id)
 }
 
-
 // UTILITY
 const codeCars = "1234567890"
+
 func genCode(length int) (string, error) {
 	buffer := make([]byte, length)
 	_, err := rand.Read(buffer)
@@ -315,5 +307,3 @@ func genCode(length int) (string, error) {
 
 	return string(buffer), nil
 }
-
-
