@@ -41,17 +41,34 @@ ingress:
   annotations: 
     kubernetes.io/ingress.class: nginx
     #cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/auth-url: http://user-service.default.svc.cluster.local/user/v1/validate
-    nginx.ingress.kubernetes.io/auth-method: 'POST'
+    nginx.ingress.kubernetes.io/auth-url: http://user-service.prod.svc.cluster.local/user/v1/verify-user
+    nginx.ingress.kubernetes.io/auth-method: 'GET'
     nginx.ingress.kubernetes.io/auth-response-headers: userId
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/limit-connections: "10"
     nginx.ingress.kubernetes.io/limit-rps: "10"
   hosts:
-    - host: localhost
+    - host: api.ticketer.ga
       paths:
         - /user/v1/*
 
+ingresspublic:
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    #cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/limit-connections: "10"
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+  hosts:
+    - host: api.ticketer.ga
+      paths:
+        - /user/v1/healthcheck
+        - /user/v1/register
+        - /user/v1/confirm-registration
+        - /user/v1/login
+        - /user/v1/send-passwd-reset
+        - /user/v1/reset-password
   tls: false
   #  - secretName: chart-example-tls
   #    hosts:
@@ -84,7 +101,7 @@ env:
         name: creds
         key: USER_PORT
   - name: PG_HOST
-    value: user-postgres
+    value: 35.205.32.101
      
   
 
