@@ -2,6 +2,7 @@ package hack
 
 import (
 	"database/sql"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -9,6 +10,10 @@ import (
 )
 
 func Init(filePath string){
+	host := os.Getenv("PG_HOST")
+	connectionParams := os.Getenv("CONNECTION_STRING")
+	connectionString := fmt.Sprintf(`host=%v %v`, host, connectionParams)
+
 	path, err := filepath.Abs(filePath)
 	if err != nil {
 		log.Fatalf("cannot get path")
@@ -19,7 +24,7 @@ func Init(filePath string){
 		log.Fatalf("cannot get path")
 	}
 
-	db, err := sql.Open("postgres", os.Getenv("CONNECTION_STRING"))
+	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		log.Fatalf("can't connect to db")
 	}
@@ -35,7 +40,11 @@ func Init(filePath string){
 }
 
 func TearDown(){
-	db, err := sql.Open("postgres", os.Getenv("CONNECTION_STRING"))
+	host := os.Getenv("PG_HOST")
+	connectionParams := os.Getenv("CONNECTION_STRING")
+	connectionString := fmt.Sprintf(`host=%v %v`, host, connectionParams)
+
+	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		log.Fatalf("can't connect to db")
 	}

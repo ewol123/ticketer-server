@@ -6,4 +6,4 @@ export CONNECTION_STRING='user=postgres password=test dbname=user_test sslmode=d
 export PORT='8000'
 go test ../api/...  -cover
 go test ../repository/... -cover
-go test ../ticket/... -cover
+go test ../user/... -cover

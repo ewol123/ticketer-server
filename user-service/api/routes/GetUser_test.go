@@ -94,7 +94,7 @@ func TestGetUserFound(t *testing.T) {
 		t.Errorf("cannot decode response body of GetUser %v", err)
 	}
 
-	isEqual := m["Email"] == "peti@test.com" && m["FullName"] == "peti" && m["RegistrationCode"] == ""
+	isEqual := m["Email"] == "test5@test.com" && m["FullName"] == "test5" && m["RegistrationCode"] == ""
 
 	if isEqual != true {
 		t.Errorf("handler returned wrong response body")
