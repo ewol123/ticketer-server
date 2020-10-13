@@ -352,7 +352,7 @@ func TestCreateTicketUser(t *testing.T) {
 	service := NewTicketService(r)
 
 	model := CreateTicketRequestModelUser{
-		UserId:    "77f4756f-7fe4-4c5f-a7b9-6c8e09627d0a",
+		RequesterId:    "77f4756f-7fe4-4c5f-a7b9-6c8e09627d0a",
 		FaultType: "leak",
 		Address:   "something",
 		FullName:  "Peter",
@@ -362,7 +362,7 @@ func TestCreateTicketUser(t *testing.T) {
 	}
 
 	invalidModel := CreateTicketRequestModelUser{
-		UserId:    "77f4756f-7fe4-4c5f-a7b9-6c8e09627d0a",
+		RequesterId:    "77f4756f-7fe4-4c5f-a7b9-6c8e09627d0a",
 		FaultType: "explosion",
 		Address:   "wrong",
 	}

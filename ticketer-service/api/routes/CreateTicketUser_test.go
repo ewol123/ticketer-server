@@ -47,7 +47,7 @@ func TestCreateTicketUser(t *testing.T) {
 
 	req, err := http.NewRequest("POST", "/user/v1/ticket",
 		strings.NewReader(`
-		{, 
+		{
 		"FaultType": "leak", 
 		"Address": "test", 
 		"FullName": "Peter", 
@@ -58,6 +58,8 @@ func TestCreateTicketUser(t *testing.T) {
 	if err != nil {
 		t.Errorf("CreateTicketUser test failed, error: %v", err)
 	}
+
+	req.Header.Add("Requester-Id", "60dd5185-6003-48da-9ff1-998a4477529c")
 
 	handler.ServeHTTP(rr, req)
 

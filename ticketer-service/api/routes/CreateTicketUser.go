@@ -25,6 +25,7 @@ func (h *handler) CreateTicketUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+	(*request)["RequesterId"] = requesterId
 
 	model := &ticket.CreateTicketRequestModelUser{}
 	err = mapdecoder.Decode(*request, &model)
@@ -32,7 +33,6 @@ func (h *handler) CreateTicketUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	model["RequesterId"] = requesterId
 
 	err = h.ticketService.CreateTicketUser(model)
 	if err != nil {
