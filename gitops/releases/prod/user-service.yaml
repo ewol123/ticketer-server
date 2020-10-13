@@ -23,13 +23,13 @@ spec:
       enabled: true
       maxReplicas: 10
       cpu: 50
-    canary:
-        enabled: true
-        istioIngress:
-          enabled: true
-          gateway: public-gateway.istio-system.svc.cluster.local
-          host: service.qchat.ga
-        loadtest:
-          enabled: true
-        helmtest:
-          enabled: true
+#    canary:
+#        enabled: true
+#        istioIngress:
+#          enabled: true
+#          gateway: public-gateway.istio-system.svc.cluster.local
+#          host: service.qchat.ga
+#        loadtest:
+#          enabled: true
+#        helmtest:
+#          enabled: true
