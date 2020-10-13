@@ -26,7 +26,7 @@ func UserAuthenticator(next http.Handler) http.Handler {
 		}
 
 		if userIdStr, ok := claims["userId"].(string); ok {
-			w.Header().Add("userId", userIdStr)
+			w.Header().Add("Requester-Id", userIdStr)
 		}
 
 		next.ServeHTTP(w, r)
