@@ -6,8 +6,8 @@ replicaCount: 2
 
 image:
   repository: gyulavaripeter/ticketer-service
-  tag: v0.0.1
-  pullPolicy: IfNotPresent
+  tag: v0.0.1-t
+  pullPolicy: Always
 
 imagePullSecrets: []
 nameOverride: ""
