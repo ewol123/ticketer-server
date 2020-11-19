@@ -1,0 +1,124 @@
+# Default values for user-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+image:
+  repository: gyulavaripeter/user-service
+  tag: v0.0.1
+  pullPolicy: Always
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: "user-service"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+ingress:
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    #cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/auth-url: http://user-service.prod.svc.cluster.local/user/v1/verify-user
+    nginx.ingress.kubernetes.io/auth-method: 'GET'
+    nginx.ingress.kubernetes.io/auth-response-headers: Requester-Id
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/limit-connections: "10"
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+  hosts:
+    - host: api.ticketer.ga
+      paths:
+        - /user/v1/*
+
+ingresspublic:
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    #cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/limit-connections: "10"
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+  hosts:
+    - host: api.ticketer.ga
+      paths:
+        - /user/v1/healthcheck
+        - /user/v1/register
+        - /user/v1/confirm-registration
+        - /user/v1/login
+        - /user/v1/send-passwd-reset
+        - /user/v1/reset-password
+  tls: false
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+env:
+  - name: SENDGRID_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: creds
+        key: USER_SENDGRID_API_KEY
+  - name: JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: creds
+        key: USER_JWT_SECRET
+  - name: DB_TYPE
+    valueFrom:
+      secretKeyRef:
+        name: creds
+        key: USER_DB_TYPE
+  - name: CONNECTION_STRING
+    valueFrom:
+      secretKeyRef:
+        name: creds
+        key: USER_CONNECTION_STRING
+  - name: PORT
+    valueFrom:
+      secretKeyRef:
+        name: creds
+        key: USER_PORT
+  - name: PG_HOST
+    value: 35.205.32.101
+     
+  
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

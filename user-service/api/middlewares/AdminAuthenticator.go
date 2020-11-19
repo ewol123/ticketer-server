@@ -24,6 +24,10 @@ func AdminAuthenticator(next http.Handler) http.Handler {
 			return
 		}
 
+		if userIdStr, ok := claims["userId"].(string); ok {
+			w.Header().Add("Requester-Id", userIdStr)
+		}
+
 		next.ServeHTTP(w, r)
 	}
 

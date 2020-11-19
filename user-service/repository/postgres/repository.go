@@ -8,6 +8,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	"log"
+	"time"
 )
 
 type pgRepository struct {
@@ -25,6 +26,7 @@ func newPgClient(connectionString string) (*sql.DB, error) {
 
 	_, err = db.Query(`SELECT * FROM "user" WHERE "id"=$1`, "69709b7e-b769-4587-ac0b-5bb99e122c27")
     if err != nil {
+    	db.Close()
 		return nil, err
     }
 
@@ -43,11 +45,16 @@ func NewPgRepository(connectionString string) (user.Repository, error) {
 		client,err := newPgClient(connectionString)
 		if err != nil {
 			attempt++
-			log.Fatalln(err)
+			log.Println(err)
+			time.Sleep(2 * time.Second)
 		} else {
 			attempt = 100
 			repo.client = client
 		}
+	}
+
+	if repo.client == nil {
+		log.Fatal("can't connect to database for the 100th time, exit")
 	}
 
 	return repo, nil

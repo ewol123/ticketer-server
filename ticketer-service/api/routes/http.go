@@ -2,16 +2,18 @@ package routes
 
 import (
 	"fmt"
-	"github.com/ewol123/ticketer-server/ticketer-service/repository/postgres"
-	js "github.com/ewol123/ticketer-server/ticketer-service/serializer/json"
-	"github.com/ewol123/ticketer-server/ticketer-service/ticket"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/ewol123/ticketer-server/ticketer-service/api/middlewares"
+	"github.com/ewol123/ticketer-server/ticketer-service/repository/postgres"
+	js "github.com/ewol123/ticketer-server/ticketer-service/serializer/json"
+	"github.com/ewol123/ticketer-server/ticketer-service/ticket"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 )
 
 // TicketHandler : TicketHandler interface
@@ -31,11 +33,9 @@ type TicketHandler interface {
 	Healthcheck(http.ResponseWriter, *http.Request)
 }
 
-
 type handler struct {
 	ticketService ticket.Service
 }
-
 
 func setupResponse(w http.ResponseWriter, contentType string, body []byte, statusCode int) {
 	w.Header().Set("Content-Type", contentType)
@@ -46,7 +46,6 @@ func setupResponse(w http.ResponseWriter, contentType string, body []byte, statu
 	}
 }
 
-
 func (h *handler) serializer(contentType string) ticket.Serializer {
 	/*if contentType = "application/x-msgpack" {
 		return &ms.Ticket{}
@@ -54,12 +53,10 @@ func (h *handler) serializer(contentType string) ticket.Serializer {
 	return &js.Ticket{}
 }
 
-
 // NewHandler : returns a new TicketHandler
 func NewHandler(ticketService ticket.Service) TicketHandler {
 	return &handler{ticketService: ticketService}
 }
-
 
 // Run: runs the server
 func Run() TicketHandler {
@@ -74,23 +71,23 @@ func Run() TicketHandler {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-
+	r.Use(middlewares.Cors)
 
 	// Public routes
-	r.Group(func(r chi.Router){
+	r.Group(func(r chi.Router) {
 		//public
-		r.Get("/public" + AppVersion + "/healthcheck", handler.Healthcheck)
+		r.Get("/public"+AppVersion+"/healthcheck", handler.Healthcheck)
 		//user
-		r.Post("/user" + AppVersion + "/ticket", handler.CreateTicketUser)
+		r.Post("/user"+AppVersion+"/ticket", handler.CreateTicketUser)
 		//worker
-		r.Get( "/worker" + AppVersion + "/ticket/{id}", handler.GetTicketWorker)
-		r.Get("/worker" + AppVersion + "/ticket", handler.GetAllTicketWorker)
-		r.Post("/worker" + AppVersion + "/ticket/sync", handler.SyncTicketWorker)
+		r.Get("/worker"+AppVersion+"/ticket/{id}", handler.GetTicketWorker)
+		r.Get("/worker"+AppVersion+"/ticket", handler.GetAllTicketWorker)
+		r.Post("/worker"+AppVersion+"/ticket/sync", handler.SyncTicketWorker)
 		//admin
-		r.Get("/admin" + AppVersion + "/ticket/{id}", handler.GetTicketAdmin)
-		r.Get("/admin" + AppVersion + "/ticket", handler.GetAllTicketAdmin)
-		r.Patch("/admin" + AppVersion + "/ticket/{id}", handler.UpdateTicketAdmin)
-		r.Delete("/admin" + AppVersion + "/ticket/{id}", handler.DeleteTicketAdmin)
+		r.Get("/admin"+AppVersion+"/ticket/{id}", handler.GetTicketAdmin)
+		r.Get("/admin"+AppVersion+"/ticket", handler.GetAllTicketAdmin)
+		r.Patch("/admin"+AppVersion+"/ticket/{id}", handler.UpdateTicketAdmin)
+		r.Delete("/admin"+AppVersion+"/ticket/{id}", handler.DeleteTicketAdmin)
 	})
 
 	errs := make(chan error, 2)
@@ -130,7 +127,9 @@ func ChooseRepo() ticket.Repository {
 	}
 	re := repo */
 	case "postgres":
-		connectionString := os.Getenv("CONNECTION_STRING")
+		host := os.Getenv("PG_HOST")
+		connectionParams := os.Getenv("CONNECTION_STRING")
+		connectionString := fmt.Sprintf(`host=%v %v`, host, connectionParams)
 		pgRepo, err := postgres.NewPgRepository(connectionString)
 		if err != nil {
 			log.Fatal(err)

@@ -3,19 +3,20 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"strings"
+	"time"
+
 	"github.com/ewol123/ticketer-server/ticketer-service/ticket"
 	"github.com/jackskj/carta"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
-	"log"
-	"strings"
 )
 
 type pgRepository struct {
-	client *sql.DB
+	client     *sql.DB
 	connString string
 }
-
 
 func newPgClient(connectionString string) (*sql.DB, error) {
 
@@ -26,6 +27,7 @@ func newPgClient(connectionString string) (*sql.DB, error) {
 
 	_, err = db.Query(`SELECT * FROM "ticket" WHERE "id"=$1`, "69709b7e-b769-4587-ac0b-5bb99e122c27")
 	if err != nil {
+		db.Close()
 		return nil, err
 	}
 
@@ -41,14 +43,19 @@ func NewPgRepository(connectionString string) (ticket.Repository, error) {
 
 	attempt := 1
 	for attempt < 100 {
-		client,err := newPgClient(connectionString)
+		client, err := newPgClient(connectionString)
 		if err != nil {
 			attempt++
 			log.Println(err)
+			time.Sleep(2 * time.Second)
 		} else {
 			attempt = 100
 			repo.client = client
 		}
+	}
+
+	if repo.client == nil {
+		log.Fatal("can't connect to database for the 100th time, exit")
 	}
 
 	return repo, nil
@@ -73,7 +80,7 @@ func (r *pgRepository) Find(column string, value string) (*ticket.Ticket, error)
      CASE WHEN image_url IS NULL THEN '' ELSE image_url END as ticket_image_url,
      status as ticket_status
 	 FROM "public"."ticket"
-     WHERE "ticket"."%v" = '%v';`,column,value)
+     WHERE "ticket"."%v" = '%v';`, column, value)
 
 	rows, err := r.client.Query(query)
 	if err != nil {
@@ -82,7 +89,7 @@ func (r *pgRepository) Find(column string, value string) (*ticket.Ticket, error)
 
 	err = carta.Map(rows, &ticketModel)
 	if err != nil {
-		return nil, errors.Wrap(err,"repository.Ticket.Find")
+		return nil, errors.Wrap(err, "repository.Ticket.Find")
 	}
 	if ticketModel.Id == "" {
 		return nil, errors.Wrap(ticket.ErrTicketNotFound, "repository.Ticket.Find")
@@ -105,7 +112,7 @@ func (r *pgRepository) FindAll(page int, rowsPerPage int, sortBy string, descend
 	}
 
 	if filter != "" {
-		whereQuery = fmt.Sprintf(`WHERE ("ticket"."full_name" ILIKE '%`+filter+`%') OR ("ticket"."address" ILIKE '%`+filter+`%') OR ("ticket"."phone" ILIKE '%`+filter+`%')`)
+		whereQuery = fmt.Sprintf(`WHERE "ticket"."full_name" ILIKE '%%%v%%' OR "ticket"."address" ILIKE '%%%v%%' OR "ticket"."phone" ILIKE '%%%v%%'`, filter, filter, filter)
 	} else {
 		whereQuery = `WHERE true`
 	}
@@ -125,7 +132,7 @@ func (r *pgRepository) FindAll(page int, rowsPerPage int, sortBy string, descend
 	if lat != "" && long != "" {
 		whereQuery += fmt.Sprintf(
 			` AND ST_DWithin("ticket".geo_location, ST_MakePoint(%v,%v)::geography, 10000)`,
-			lat,long)
+			lat, long)
 	}
 
 	countSql := fmt.Sprintf(`SELECT COUNT(id) FROM "ticket" %v`, whereQuery)
@@ -154,7 +161,7 @@ func (r *pgRepository) FindAll(page int, rowsPerPage int, sortBy string, descend
 	   LIMIT  %v
 	   OFFSET %v
 	   ) sub;
-	`,whereQuery,sortBy, desc,rowsPerPage,offset)
+	`, whereQuery, sortBy, desc, rowsPerPage, offset)
 
 	rows, err := r.client.Query(sql)
 
@@ -162,10 +169,10 @@ func (r *pgRepository) FindAll(page int, rowsPerPage int, sortBy string, descend
 		return nil, 0, errors.Wrap(err, "repository.Ticket.FindAll")
 	}
 
-	err = carta.Map(rows, &tickets )
+	err = carta.Map(rows, &tickets)
 
 	if err != nil {
-		return nil, 0, errors.Wrap(err,"repository.Ticket.FindAll")
+		return nil, 0, errors.Wrap(err, "repository.Ticket.FindAll")
 	}
 
 	result, err := r.client.Query(countSql)
@@ -201,8 +208,7 @@ func (r *pgRepository) Store(t *ticket.Ticket) (*ticket.Ticket, error) {
 	lat := geo[0]
 	long := geo[1]
 
-
-	_, err =  tx.Exec(`INSERT INTO "ticket" (id, user_id, fault_type, address, full_name,phone,geo_location,image_url,status,created_at,updated_at) VALUES ($1,$2,$3,$4,$5,$6,ST_MakePoint($7,$8),$9,$10,$11,$12)`,t.Id,t.UserId,t.FaultType,t.Address,t.FullName,t.Phone,lat,long,t.ImageUrl,t.Status,t.CreatedAt,t.UpdatedAt)
+	_, err = tx.Exec(`INSERT INTO "ticket" (id, user_id, fault_type, address, full_name,phone,geo_location,image_url,status,created_at,updated_at) VALUES ($1,$2,$3,$4,$5,$6,ST_MakePoint($7,$8),$9,$10,$11,$12)`, t.Id, t.UserId, t.FaultType, t.Address, t.FullName, t.Phone, lat, long, t.ImageUrl, t.Status, t.CreatedAt, t.UpdatedAt)
 	if err != nil {
 		log.Println(err)
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
@@ -240,14 +246,11 @@ func (r *pgRepository) Update(t *ticket.Ticket) error {
 	address = case when $4 = '' THEN "ticket"."address" ELSE $4 END,
 	full_name = case when $5 = '' THEN "ticket"."full_name" ELSE $5 END,
 	phone = case when $6 = '' THEN "ticket"."phone" ELSE $6 END,
-	geo_location = case when $7 > '0' THEN "ticket"."geo_location" ELSE ST_MakePoint($7::double precision, $8::double precision) END,
+	geo_location = case when $7 = '0' THEN "ticket"."geo_location" ELSE ST_MakePoint($7::double precision, $8::double precision) END,
 	image_url = case when $9 = '' THEN "ticket"."image_url" ELSE $9 END,
 	status = case when $10 = '' THEN "ticket"."status" ELSE $10::"StatusType" END,
-	created_at = case when $11 = '' THEN "ticket"."created_at" ELSE $11::timestamp without time zone END,
-	updated_at = case when $12 = '' THEN "ticket"."updated_at" ELSE $12::timestamp without time zone END
-FROM ticket t WHERE "ticket"."id" = $13`, t.UserId,t.WorkerId,t.FaultType,t.Address,t.FullName,t.Phone,lat,long,t.ImageUrl,t.Status,t.CreatedAt,t.UpdatedAt,t.Id)
-
-
+	updated_at = now()
+FROM ticket t WHERE "ticket"."id" = $11`, t.UserId, t.WorkerId, t.FaultType, t.Address, t.FullName, t.Phone, lat, long, t.ImageUrl, t.Status, t.Id)
 	if err != nil {
 		log.Println(err)
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
@@ -260,7 +263,7 @@ FROM ticket t WHERE "ticket"."id" = $13`, t.UserId,t.WorkerId,t.FaultType,t.Addr
 		return errors.Wrap(err, "repository.Ticket.Update")
 	}
 
-	rowsAffected,err := response.RowsAffected()
+	rowsAffected, err := response.RowsAffected()
 
 	if err != nil {
 		return errors.Wrap(err, "repository.Ticket.Update")
@@ -280,7 +283,6 @@ func (r *pgRepository) Delete(id string) error {
 		return errors.Wrap(err, "repository.Ticket.Delete")
 	}
 
-
 	res, err := tx.Exec(`DELETE FROM "ticket" WHERE "ticket"."id" = $1`, id)
 	if err != nil {
 		log.Println(err)
@@ -294,7 +296,7 @@ func (r *pgRepository) Delete(id string) error {
 		return errors.Wrap(err, "repository.Ticket.Delete")
 	}
 
-	rowsAffected,err := res.RowsAffected()
+	rowsAffected, err := res.RowsAffected()
 
 	if err != nil {
 		return errors.Wrap(err, "repository.Ticket.Delete")
