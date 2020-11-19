@@ -246,13 +246,11 @@ func (r *pgRepository) Update(t *ticket.Ticket) error {
 	address = case when $4 = '' THEN "ticket"."address" ELSE $4 END,
 	full_name = case when $5 = '' THEN "ticket"."full_name" ELSE $5 END,
 	phone = case when $6 = '' THEN "ticket"."phone" ELSE $6 END,
-	geo_location = case when $7 > '0' THEN "ticket"."geo_location" ELSE ST_MakePoint($7::double precision, $8::double precision) END,
+	geo_location = case when $7 = '0' THEN "ticket"."geo_location" ELSE ST_MakePoint($7::double precision, $8::double precision) END,
 	image_url = case when $9 = '' THEN "ticket"."image_url" ELSE $9 END,
 	status = case when $10 = '' THEN "ticket"."status" ELSE $10::"StatusType" END,
-	created_at = case when $11 = '' THEN "ticket"."created_at" ELSE $11::timestamp without time zone END,
-	updated_at = case when $12 = '' THEN "ticket"."updated_at" ELSE $12::timestamp without time zone END
-FROM ticket t WHERE "ticket"."id" = $13`, t.UserId, t.WorkerId, t.FaultType, t.Address, t.FullName, t.Phone, lat, long, t.ImageUrl, t.Status, t.CreatedAt, t.UpdatedAt, t.Id)
-
+	updated_at = now()
+FROM ticket t WHERE "ticket"."id" = $11`, t.UserId, t.WorkerId, t.FaultType, t.Address, t.FullName, t.Phone, lat, long, t.ImageUrl, t.Status, t.Id)
 	if err != nil {
 		log.Println(err)
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
