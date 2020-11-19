@@ -17,7 +17,7 @@ spec:
   values:
     image: 
       repository: gyulavaripeter/ticketer-service
-      tag: v0.0.1-t
+      tag: v1.0.0-t
     replicaCount: 2
     hpa:
       enabled: true
