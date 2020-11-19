@@ -70,6 +70,7 @@ func Run() UserHandler {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(middlewares.Cors)
 
 	//Protected routes (USER)
 	r.Group(func(r chi.Router) {

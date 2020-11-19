@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/ewol123/ticketer-server/ticketer-service/api/middlewares"
 	"github.com/ewol123/ticketer-server/ticketer-service/repository/postgres"
 	js "github.com/ewol123/ticketer-server/ticketer-service/serializer/json"
 	"github.com/ewol123/ticketer-server/ticketer-service/ticket"
@@ -70,6 +71,7 @@ func Run() TicketHandler {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(middlewares.Cors)
 
 	// Public routes
 	r.Group(func(r chi.Router) {
